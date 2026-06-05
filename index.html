@@ -1,0 +1,3190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAYXZ — Content Operating System</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Unbounded:wght@300;400;600;700;900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void: #0a0a0a;
+    --void2: #111111;
+    --void3: #1a1a1a;
+    --surface: #1f1f1f;
+    --surface2: #242424;
+    --border: #2a2a2a;
+    --border2: #333333;
+    --bone: #e8e2d9;
+    --bone2: #c8c2b9;
+    --graphite: #888888;
+    --graphite2: #555555;
+    --sand: #c4a882;
+    --sand2: #8a7456;
+    --signal: #cc3322;
+    --signal2: #ff4433;
+    --electric: #2255cc;
+    --electric2: #4477ff;
+    --gold: #c8a84b;
+    --green: #3a7a4a;
+    --green2: #4a9a5a;
+    --purple: #6633cc;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--void);
+    color: var(--bone);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    overflow-x: hidden;
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: var(--void); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+  /* TOP NAV */
+  .topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    background: rgba(10,10,10,0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    height: 52px;
+  }
+
+  .logo {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 900;
+    font-size: 16px;
+    letter-spacing: 0.15em;
+    color: var(--bone);
+  }
+
+  .logo span { color: var(--signal2); }
+
+  .nav-tabs {
+    display: flex;
+    gap: 2px;
+  }
+
+  .nav-tab {
+    padding: 6px 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--graphite);
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+    border: none;
+    background: transparent;
+  }
+
+  .nav-tab:hover { color: var(--bone2); background: var(--void3); }
+  .nav-tab.active { color: var(--bone); background: var(--surface); }
+
+  .status-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    color: var(--graphite);
+    letter-spacing: 0.08em;
+  }
+
+  .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green2);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* MAIN LAYOUT */
+  .main {
+    margin-top: 52px;
+    padding: 32px;
+    max-width: 1600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* PAGE HEADER */
+  .page-header {
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .page-header h1 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--bone);
+    margin-bottom: 6px;
+  }
+
+  .page-header p {
+    color: var(--graphite);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+  }
+
+  /* GRID LAYOUTS */
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+  .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 24px; }
+
+  /* CARDS */
+  .card {
+    background: var(--void2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover { border-color: var(--border2); }
+
+  .card-label {
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--graphite2);
+    margin-bottom: 8px;
+  }
+
+  .card-value {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--bone);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .card-sub {
+    font-size: 10px;
+    color: var(--graphite);
+    letter-spacing: 0.04em;
+  }
+
+  .card-delta {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    margin-top: 8px;
+    padding: 3px 8px;
+    border-radius: 20px;
+  }
+
+  .delta-up { background: rgba(58,122,74,0.15); color: var(--green2); }
+  .delta-down { background: rgba(204,51,34,0.15); color: var(--signal2); }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--graphite);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* PILLAR CARDS */
+  .pillar-card {
+    background: var(--void2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .pillar-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .pillar-number {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    color: var(--graphite2);
+  }
+
+  .pillar-name {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--bone);
+    margin-top: 4px;
+    letter-spacing: 0.05em;
+  }
+
+  .pillar-pct {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+  }
+
+  .pillar-body { padding: 16px 20px; }
+
+  .pillar-tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin: 3px 3px 3px 0;
+    border: 1px solid;
+  }
+
+  .pillar-list {
+    margin-top: 12px;
+    list-style: none;
+  }
+
+  .pillar-list li {
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--bone2);
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .pillar-list li:last-child { border-bottom: none; }
+
+  .pillar-list li::before {
+    content: '→';
+    color: var(--graphite2);
+    font-size: 10px;
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+
+  /* CONTENT TABLE */
+  .content-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+  }
+
+  .content-table th {
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--graphite2);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  .content-table td {
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--bone2);
+    vertical-align: top;
+  }
+
+  .content-table tr:hover td { background: var(--void3); }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    font-weight: 500;
+  }
+
+  .badge-reel { background: rgba(100,77,255,0.15); color: #8a77ff; border: 1px solid rgba(100,77,255,0.3); }
+  .badge-carousel { background: rgba(34,85,204,0.15); color: var(--electric2); border: 1px solid rgba(34,85,204,0.3); }
+  .badge-story { background: rgba(200,168,75,0.15); color: var(--gold); border: 1px solid rgba(200,168,75,0.3); }
+  .badge-static { background: rgba(136,136,136,0.1); color: var(--graphite); border: 1px solid rgba(136,136,136,0.2); }
+
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+  }
+
+  .s-idea { background: var(--graphite2); }
+  .s-shoot { background: var(--gold); }
+  .s-edit { background: var(--electric2); }
+  .s-ready { background: #aa77ff; }
+  .s-live { background: var(--green2); }
+
+  /* PRIORITY */
+  .priority {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+  }
+
+  .p-high { color: var(--signal2); }
+  .p-med { color: var(--gold); }
+  .p-low { color: var(--graphite); }
+
+  /* CALENDAR */
+  .week-block {
+    background: var(--void2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .week-header {
+    padding: 14px 20px;
+    background: var(--void3);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .week-label {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--bone);
+  }
+
+  .week-focus {
+    font-size: 10px;
+    color: var(--sand);
+    letter-spacing: 0.06em;
+    font-style: italic;
+  }
+
+  .week-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+  }
+
+  .day-cell {
+    padding: 12px;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    min-height: 120px;
+  }
+
+  .day-cell:last-child { border-right: none; }
+
+  .day-name {
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--graphite2);
+    margin-bottom: 8px;
+  }
+
+  .day-num {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--bone);
+    margin-bottom: 8px;
+  }
+
+  .day-type {
+    font-size: 9px;
+    color: var(--sand);
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+    font-style: italic;
+  }
+
+  .day-hook {
+    font-size: 9px;
+    color: var(--bone2);
+    line-height: 1.4;
+    margin-bottom: 6px;
+  }
+
+  .day-tag {
+    font-size: 8px;
+    padding: 2px 7px;
+    border-radius: 10px;
+    display: inline-block;
+    margin-top: 4px;
+  }
+
+  .tag-world { background: rgba(100,77,255,0.12); color: #8a77ff; }
+  .tag-brand { background: rgba(34,85,204,0.12); color: var(--electric2); }
+  .tag-story { background: rgba(204,51,34,0.12); color: var(--signal2); }
+  .tag-off { background: rgba(58,122,74,0.12); color: var(--green2); }
+
+  /* SHOT LIBRARY */
+  .shot-category {
+    background: var(--void2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .shot-header {
+    padding: 14px 20px;
+    background: var(--void3);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .shot-icon { font-size: 16px; }
+
+  .shot-cat-name {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--bone);
+  }
+
+  .shot-count {
+    margin-left: auto;
+    font-size: 9px;
+    color: var(--graphite);
+    letter-spacing: 0.1em;
+  }
+
+  .shot-body {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+  }
+
+  .shot-col {
+    padding: 14px 16px;
+    border-right: 1px solid var(--border);
+  }
+
+  .shot-col:last-child { border-right: none; }
+
+  .shot-col-title {
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--graphite2);
+    margin-bottom: 10px;
+  }
+
+  .shot-item {
+    font-size: 10px;
+    color: var(--bone2);
+    padding: 4px 0;
+    display: flex;
+    gap: 6px;
+    line-height: 1.4;
+  }
+
+  .shot-item::before {
+    content: '·';
+    color: var(--sand);
+    flex-shrink: 0;
+  }
+
+  /* REEL SYSTEM */
+  .reel-card {
+    background: var(--void2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    transition: border-color 0.2s;
+  }
+
+  .reel-card:hover { border-color: var(--border2); }
+
+  .reel-num {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 9px;
+    color: var(--graphite2);
+    letter-spacing: 0.15em;
+    margin-bottom: 8px;
+  }
+
+  .reel-hook {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--bone);
+    line-height: 1.4;
+    margin-bottom: 10px;
+    font-style: italic;
+  }
+
+  .reel-meta {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+
+  .reel-pill {
+    font-size: 8px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    letter-spacing: 0.08em;
+  }
+
+  .reel-diff-1 { background: rgba(58,122,74,0.15); color: var(--green2); }
+  .reel-diff-2 { background: rgba(200,168,75,0.15); color: var(--gold); }
+  .reel-diff-3 { background: rgba(204,51,34,0.15); color: var(--signal2); }
+
+  .reel-seq {
+    font-size: 10px;
+    color: var(--graphite);
+    line-height: 1.6;
+    border-top: 1px solid var(--border);
+    padding-top: 10px;
+    margin-top: 4px;
+  }
+
+  /* GEAR LIST */
+  .gear-card {
+    background: var(--void2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .gear-header {
+    padding: 14px 20px;
+    background: var(--void3);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .gear-category {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--bone);
+  }
+
+  .gear-item {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .gear-item:last-child { border-bottom: none; }
+
+  .gear-name {
+    font-size: 11px;
+    color: var(--bone2);
+  }
+
+  .gear-why {
+    font-size: 9px;
+    color: var(--graphite);
+    margin-top: 2px;
+  }
+
+  .gear-price {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--sand);
+    white-space: nowrap;
+  }
+
+  .gear-priority {
+    font-size: 8px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    white-space: nowrap;
+  }
+
+  .gp-must { background: rgba(204,51,34,0.15); color: var(--signal2); }
+  .gp-need { background: rgba(200,168,75,0.15); color: var(--gold); }
+  .gp-nice { background: rgba(136,136,136,0.1); color: var(--graphite); }
+
+  /* OPERATING SYSTEM WEEK */
+  .os-day {
+    background: var(--void2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .os-day-header {
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .os-day-name {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--bone);
+    letter-spacing: 0.05em;
+  }
+
+  .os-day-type {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  .dt-film { background: rgba(204,51,34,0.15); color: var(--signal2); }
+  .dt-edit { background: rgba(34,85,204,0.15); color: var(--electric2); }
+  .dt-post { background: rgba(58,122,74,0.15); color: var(--green2); }
+  .dt-plan { background: rgba(200,168,75,0.15); color: var(--gold); }
+  .dt-analytics { background: rgba(102,51,204,0.15); color: #9966ff; }
+  .dt-rest { background: rgba(136,136,136,0.1); color: var(--graphite); }
+
+  .os-timeline {
+    padding: 16px 20px;
+  }
+
+  .time-block {
+    display: flex;
+    gap: 16px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .time-block:last-child { border-bottom: none; }
+
+  .time-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--graphite2);
+    width: 50px;
+    flex-shrink: 0;
+    padding-top: 1px;
+  }
+
+  .time-task {
+    font-size: 11px;
+    color: var(--bone2);
+    line-height: 1.4;
+  }
+
+  .time-note {
+    font-size: 9px;
+    color: var(--graphite);
+    margin-top: 2px;
+    font-style: italic;
+  }
+
+  /* STORY SYSTEM */
+  .story-frame {
+    background: var(--void2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .story-time-header {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .story-clock {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--sand);
+    letter-spacing: 0.1em;
+  }
+
+  .story-period {
+    font-size: 9px;
+    color: var(--graphite);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .story-items { padding: 12px 0; }
+
+  .story-item {
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .story-item:last-child { border-bottom: none; }
+
+  .story-item-type {
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--graphite2);
+    margin-bottom: 4px;
+  }
+
+  .story-item-text {
+    font-size: 11px;
+    color: var(--bone2);
+    line-height: 1.4;
+    margin-bottom: 4px;
+  }
+
+  .story-item-why {
+    font-size: 9px;
+    color: var(--graphite);
+    font-style: italic;
+  }
+
+  /* CONTENT ENGINE */
+  .engine-flow {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    background: var(--void2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .engine-source {
+    padding: 20px;
+    background: var(--void3);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 200px;
+  }
+
+  .engine-label {
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--graphite2);
+    margin-bottom: 6px;
+  }
+
+  .engine-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--bone);
+  }
+
+  .engine-outputs {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .engine-output {
+    padding: 16px;
+    border-right: 1px solid var(--border);
+  }
+
+  .engine-output:last-child { border-right: none; }
+
+  .engine-output-type {
+    font-size: 8px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--graphite2);
+    margin-bottom: 6px;
+  }
+
+  .engine-output-title {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--bone2);
+    margin-bottom: 6px;
+  }
+
+  .engine-output-steps {
+    list-style: none;
+  }
+
+  .engine-output-steps li {
+    font-size: 9px;
+    color: var(--graphite);
+    padding: 2px 0;
+    display: flex;
+    gap: 6px;
+  }
+
+  .engine-output-steps li::before {
+    content: '→';
+    color: var(--graphite2);
+  }
+
+  /* HOOKS TABLE */
+  .hooks-section {
+    background: var(--void2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .hooks-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .hooks-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--bone);
+  }
+
+  .hook-row {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 3fr 1fr 1fr;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .hook-row:last-child { border-bottom: none; }
+
+  .hook-text {
+    font-size: 12px;
+    color: var(--bone);
+    font-style: italic;
+    line-height: 1.4;
+  }
+
+  .hook-type {
+    font-size: 9px;
+    color: var(--graphite);
+    letter-spacing: 0.06em;
+  }
+
+  .hook-why {
+    font-size: 9px;
+    color: var(--graphite2);
+  }
+
+  /* CAPTIONS */
+  .caption-card {
+    background: var(--void2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+  }
+
+  .caption-pillar {
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--graphite2);
+    margin-bottom: 8px;
+  }
+
+  .caption-text {
+    font-size: 12px;
+    color: var(--bone2);
+    line-height: 1.7;
+    margin-bottom: 10px;
+    font-style: italic;
+    font-family: 'Instrument Serif', serif;
+  }
+
+  .caption-cta {
+    font-size: 9px;
+    color: var(--sand);
+    letter-spacing: 0.06em;
+  }
+
+  /* PROGRESS BARS */
+  .progress-bar {
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.8s ease;
+  }
+
+  /* KPI ROW */
+  .kpi-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .kpi-item {
+    flex: 1;
+    background: var(--void2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+  }
+
+  .kpi-label {
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--graphite2);
+    margin-bottom: 6px;
+  }
+
+  .kpi-val {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--bone);
+    margin-bottom: 8px;
+  }
+
+  .kpi-target {
+    font-size: 9px;
+    color: var(--graphite);
+  }
+
+  /* SCROLLABLE TABLE WRAPPER */
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 24px;
+  }
+
+  .table-wrap .content-table { min-width: 900px; }
+
+  /* CHAPTER SERIES */
+  .series-card {
+    background: var(--void2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    border-left: 3px solid var(--sand);
+  }
+
+  .series-name {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--sand);
+    margin-bottom: 6px;
+  }
+
+  .series-desc {
+    font-size: 11px;
+    color: var(--bone2);
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+
+  .series-episodes {
+    list-style: none;
+  }
+
+  .series-episodes li {
+    font-size: 10px;
+    color: var(--graphite);
+    padding: 3px 0;
+    display: flex;
+    gap: 8px;
+  }
+
+  .series-episodes li::before {
+    content: 'EP';
+    font-family: 'Unbounded', sans-serif;
+    font-size: 7px;
+    color: var(--graphite2);
+    margin-top: 2px;
+  }
+
+  /* EDITING GUIDE */
+  .edit-step {
+    background: var(--void2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .edit-num {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--border2);
+    min-width: 32px;
+    line-height: 1;
+  }
+
+  .edit-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--bone);
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+
+  .edit-desc {
+    font-size: 11px;
+    color: var(--bone2);
+    line-height: 1.6;
+  }
+
+  .edit-spec {
+    font-size: 10px;
+    color: var(--sand);
+    margin-top: 6px;
+    font-style: italic;
+  }
+
+  /* SCROLLABLE SECTION TABS */
+  .sub-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .sub-tabs::-webkit-scrollbar { display: none; }
+
+  .sub-tab {
+    padding: 7px 16px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--graphite);
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+    white-space: nowrap;
+    background: transparent;
+  }
+
+  .sub-tab:hover { color: var(--bone2); background: var(--void3); }
+  .sub-tab.active { color: var(--bone); background: var(--surface); border-color: var(--border2); }
+
+  .sub-section { display: none; }
+  .sub-section.active { display: block; }
+
+  /* ACCENT COLORS PER PILLAR */
+  .accent-world { color: #8a77ff; }
+  .accent-brand { color: var(--electric2); }
+  .accent-story { color: var(--signal2); }
+  .accent-process { color: var(--sand); }
+  .accent-culture { color: var(--green2); }
+
+  .border-world { border-left: 3px solid #8a77ff; }
+  .border-brand { border-left: 3px solid var(--electric2); }
+  .border-story { border-left: 3px solid var(--signal2); }
+  .border-process { border-left: 3px solid var(--sand); }
+  .border-culture { border-left: 3px solid var(--green2); }
+
+  /* RESPONSIVE NOTICE */
+  @media (max-width: 1100px) {
+    .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    .grid-5 { grid-template-columns: repeat(3, 1fr); }
+    .week-grid { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  @media (max-width: 768px) {
+    .main { padding: 16px; }
+    .topbar { padding: 0 16px; }
+    .grid-3, .grid-4, .grid-5 { grid-template-columns: repeat(2, 1fr); }
+    .grid-2 { grid-template-columns: 1fr; }
+    .week-grid { grid-template-columns: repeat(2, 1fr); }
+    .shot-body { grid-template-columns: 1fr; }
+    .engine-outputs { grid-template-columns: repeat(2, 1fr); }
+    .nav-tabs { display: none; }
+    .hook-row { grid-template-columns: 1fr; }
+  }
+
+  /* TOOLTIP */
+  [data-tip] {
+    position: relative;
+    cursor: help;
+  }
+
+  /* INLINE DIVIDER */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 24px 0;
+  }
+
+  /* HIGHLIGHT TEXT */
+  .hl { color: var(--bone); font-weight: 500; }
+  .hl-sand { color: var(--sand); }
+  .hl-signal { color: var(--signal2); }
+  .hl-gold { color: var(--gold); }
+
+  /* FOOTER */
+  .footer-note {
+    margin-top: 48px;
+    padding: 20px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--graphite2);
+  }
+
+  .footer-note span {
+    font-family: 'Unbounded', sans-serif;
+    color: var(--graphite);
+  }
+
+  /* INTRO BLOCK */
+  .intro-block {
+    background: linear-gradient(135deg, var(--void2) 0%, var(--void3) 100%);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 28px 32px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 32px;
+  }
+
+  .intro-left { flex: 1; }
+
+  .intro-eyebrow {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--graphite2);
+    margin-bottom: 10px;
+  }
+
+  .intro-heading {
+    font-family: 'Instrument Serif', serif;
+    font-size: 32px;
+    color: var(--bone);
+    line-height: 1.2;
+    margin-bottom: 12px;
+    font-style: italic;
+  }
+
+  .intro-sub {
+    font-size: 11px;
+    color: var(--graphite);
+    line-height: 1.8;
+    max-width: 500px;
+  }
+
+  .intro-right {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 200px;
+  }
+
+  .intro-stat {
+    background: var(--void);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 16px;
+  }
+
+  .intro-stat-label {
+    font-size: 8px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--graphite2);
+    margin-bottom: 4px;
+  }
+
+  .intro-stat-val {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--bone);
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="logo">M4YXZ <span>OS</span></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showSection('dashboard')">Dashboard</button>
+    <button class="nav-tab" onclick="showSection('pillars')">Pillars</button>
+    <button class="nav-tab" onclick="showSection('calendar')">Calendar</button>
+    <button class="nav-tab" onclick="showSection('tracker')">Tracker</button>
+    <button class="nav-tab" onclick="showSection('shots')">Shot Library</button>
+    <button class="nav-tab" onclick="showSection('reels')">Reel System</button>
+    <button class="nav-tab" onclick="showSection('hooks')">Hooks + Captions</button>
+    <button class="nav-tab" onclick="showSection('engine')">Content Engine</button>
+    <button class="nav-tab" onclick="showSection('os')">Weekly OS</button>
+    <button class="nav-tab" onclick="showSection('gear')">Gear</button>
+    <button class="nav-tab" onclick="showSection('edit')">Edit Guide</button>
+  </div>
+  <div class="status-badge">
+    <div class="dot"></div>
+    SYSTEM ACTIVE
+  </div>
+</nav>
+
+<div class="main">
+
+<!-- ============================================================ -->
+<!-- SECTION: DASHBOARD -->
+<!-- ============================================================ -->
+<div id="section-dashboard" class="section active">
+
+  <div class="intro-block">
+    <div class="intro-left">
+      <div class="intro-eyebrow">Content Operating System · v1.0</div>
+      <div class="intro-heading">Build the world.<br>Document the process.</div>
+      <div class="intro-sub">MAYXZ is not a clothing brand. It's a real-life documentary happening in public. This OS is your complete infrastructure — from first shot to 10K followers and beyond. Everything is here. Film it. Edit it. Post it. Repeat.</div>
+    </div>
+    <div class="intro-right">
+      <div class="intro-stat">
+        <div class="intro-stat-label">Phase</div>
+        <div class="intro-stat-val">LAUNCH</div>
+      </div>
+      <div class="intro-stat">
+        <div class="intro-stat-label">Target Followers</div>
+        <div class="intro-stat-val">10K+</div>
+      </div>
+      <div class="intro-stat">
+        <div class="intro-stat-label">Days to Goal</div>
+        <div class="intro-stat-val">90</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI METRICS -->
+  <div class="section-title">Live Metrics</div>
+  <div class="grid-4" style="margin-bottom:28px;">
+    <div class="card">
+      <div class="card-label">Followers</div>
+      <div class="card-value" id="kpi-followers">0</div>
+      <div class="card-sub">Target: 10,000</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:1%;background:var(--sand);"></div></div>
+      <div class="card-delta delta-up">↑ Update manually</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Posts This Month</div>
+      <div class="card-value" id="kpi-posts">0</div>
+      <div class="card-sub">Target: 20/month</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:0%;background:var(--electric2);"></div></div>
+    </div>
+    <div class="card">
+      <div class="card-label">Avg Engagement Rate</div>
+      <div class="card-value">—</div>
+      <div class="card-sub">Target: >5%</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:0%;background:var(--green2);"></div></div>
+    </div>
+    <div class="card">
+      <div class="card-label">Reels Filmed</div>
+      <div class="card-value" id="kpi-reels">0</div>
+      <div class="card-sub">Target: 30 in 90 days</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:0%;background:#8a77ff;"></div></div>
+    </div>
+  </div>
+
+  <!-- PHASE OVERVIEW -->
+  <div class="section-title">90-Day Phase Plan</div>
+  <div class="grid-3" style="margin-bottom:28px;">
+    <div class="card border-world">
+      <div class="card-label" style="color:#8a77ff;">Phase 01 · Days 1–30</div>
+      <div style="font-family:'Unbounded',sans-serif;font-size:14px;font-weight:700;margin-bottom:10px;">World Building</div>
+      <ul class="pillar-list">
+        <li>Establish aesthetic — 3 visual references per post</li>
+        <li>Launch EARLY series — morning rituals, 6am shots</li>
+        <li>Post 5x/week minimum, test 3 hooks per reel</li>
+        <li>Build shot library backlog of 50+ clips</li>
+        <li>Goal: 500–1K followers, 10% engagement on early posts</li>
+      </ul>
+    </div>
+    <div class="card border-brand">
+      <div class="card-label" style="color:var(--electric2);">Phase 02 · Days 31–60</div>
+      <div style="font-family:'Unbounded',sans-serif;font-size:14px;font-weight:700;margin-bottom:10px;">Momentum</div>
+      <ul class="pillar-list">
+        <li>Launch BUILDING IN SILENCE and PROCESS series</li>
+        <li>First product tease — no CTA, pure world building</li>
+        <li>Introduce CHAPTERS — founder story drops, 1x/week</li>
+        <li>Collab shots: cities, architecture, coffee shops</li>
+        <li>Goal: 3K–5K followers, viral reel attempt</li>
+      </ul>
+    </div>
+    <div class="card border-story">
+      <div class="card-label" style="color:var(--signal2);">Phase 03 · Days 61–90</div>
+      <div style="font-family:'Unbounded',sans-serif;font-size:14px;font-weight:700;margin-bottom:10px;">Authority</div>
+      <ul class="pillar-list">
+        <li>PRESSURE CREATES CLARITY series — transformation arc</li>
+        <li>Drop waitlist / pre-order announcement (cinematic)</li>
+        <li>ONE DAY series — full day in the life documentary</li>
+        <li>Behind the brand drops — brand DNA content</li>
+        <li>Goal: 10K followers, waitlist sign-ups, sales pipeline</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- CONTENT SPLIT -->
+  <div class="section-title">Content Split Mandate</div>
+  <div class="grid-3" style="margin-bottom:28px;">
+    <div class="card" style="border-left:3px solid #8a77ff;">
+      <div class="card-label" style="color:#8a77ff;">70% — World Building</div>
+      <div style="font-size:11px;color:var(--bone2);line-height:1.8;">
+        Coffee. Architecture. Quiet mornings. Cities. Airports. Studios. The brand's <em>feeling</em> before its products. This is what makes people follow before they ever see a product.
+      </div>
+    </div>
+    <div class="card" style="border-left:3px solid var(--electric2);">
+      <div class="card-label" style="color:var(--electric2);">20% — Brand Building</div>
+      <div style="font-size:11px;color:var(--bone2);line-height:1.8;">
+        Process content. Behind the brand. Design details. Shipping boxes. Fabric swatches. The brand being built in real-time. Invites the audience into the construction.
+      </div>
+    </div>
+    <div class="card" style="border-left:3px solid var(--signal2);">
+      <div class="card-label" style="color:var(--signal2);">10% — Deep Story</div>
+      <div style="font-size:11px;color:var(--bone2);line-height:1.8;">
+        The founder's arc. CPTSD → discipline. ADHD as superpower. ARFID as identity. Addiction overcome. Never spoken directly — shown through the work. Maximum impact, minimum exposure.
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENT SERIES -->
+  <div class="section-title">Recurring Series</div>
+  <div class="grid-3">
+    <div class="series-card">
+      <div class="series-name">CHAPTERS</div>
+      <div class="series-desc">The founder's story, told in fragments. Each chapter reveals more. Audience pieces it together. Documentary format, minimal voiceover, let footage speak.</div>
+      <ul class="series-episodes">
+        <li>CH.01 — Before The Name</li>
+        <li>CH.02 — Why I Build</li>
+        <li>CH.03 — The Silence Period</li>
+        <li>CH.04 — What Pressure Does</li>
+        <li>CH.05 — The Outsider's Edge</li>
+      </ul>
+    </div>
+    <div class="series-card">
+      <div class="series-name">BUILDING IN SILENCE</div>
+      <div class="series-desc">No announcements. No previews. Pure process. Film the work before it's done. Let the world watch before they know what it is.</div>
+      <ul class="series-episodes">
+        <li>BIS.01 — First sketch to final logo</li>
+        <li>BIS.02 — Sourcing fabrics, no talking</li>
+        <li>BIS.03 — Website going live</li>
+        <li>BIS.04 — Packaging design process</li>
+        <li>BIS.05 — Sample arrival day</li>
+      </ul>
+    </div>
+    <div class="series-card">
+      <div class="series-name">PRESSURE CREATES CLARITY</div>
+      <div class="series-desc">Short-form philosophy. 15–30 second truth bombs. Things that hit differently when you've been through pressure. No fluff, no motivation-bro energy.</div>
+      <ul class="series-episodes">
+        <li>PCC.01 — Pressure is a filter</li>
+        <li>PCC.02 — Silence is not weakness</li>
+        <li>PCC.03 — Build when no one watches</li>
+        <li>PCC.04 — The work is the proof</li>
+        <li>PCC.05 — Chaos → System → Output</li>
+      </ul>
+    </div>
+    <div class="series-card">
+      <div class="series-name">EARLY</div>
+      <div class="series-desc">6am–8am shots. Coffee brewing. First light through windows. Pre-city silence. The ritual before the world wakes up. Pure aesthetic.</div>
+      <ul class="series-episodes">
+        <li>EARLY.01 — Morning routine, no face</li>
+        <li>EARLY.02 — Coffee prep in detail</li>
+        <li>EARLY.03 — First task of the day</li>
+        <li>EARLY.04 — City at dawn, walking</li>
+        <li>EARLY.05 — Desk setup before work</li>
+      </ul>
+    </div>
+    <div class="series-card">
+      <div class="series-name">ONE DAY</div>
+      <div class="series-desc">Full-day documentary format. 60–90 second reel covering a single complete day in the MAYXZ world. Shows the full lifestyle arc.</div>
+      <ul class="series-episodes">
+        <li>OD.01 — Design day from 6am</li>
+        <li>OD.02 — Shoot day in the city</li>
+        <li>OD.03 — Sample day arrival</li>
+        <li>OD.04 — Travel day (nomad)</li>
+        <li>OD.05 — Rest and reset day</li>
+      </ul>
+    </div>
+    <div class="series-card">
+      <div class="series-name">PROCESS</div>
+      <div class="series-desc">The technical side of building. Design decisions, system thinking, creative process exposed. For the builders in the audience. Earns credibility.</div>
+      <ul class="series-episodes">
+        <li>PR.01 — Picking brand fonts</li>
+        <li>PR.02 — Color palette breakdown</li>
+        <li>PR.03 — Naming a product</li>
+        <li>PR.04 — Building the Shopify store</li>
+        <li>PR.05 — Writing copy for a drop</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION: CONTENT PILLARS -->
+<!-- ============================================================ -->
+<div id="section-pillars" class="section">
+  <div class="page-header">
+    <h1>CONTENT PILLARS</h1>
+    <p>5 core pillars that govern every piece of content. Every post maps to one.</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
+
+    <div class="pillar-card border-world">
+      <div class="pillar-header">
+        <div>
+          <div class="pillar-number">PILLAR 01</div>
+          <div class="pillar-name accent-world">THE WORLD</div>
+        </div>
+        <div class="pillar-pct accent-world">40%</div>
+      </div>
+      <div class="pillar-body">
+        <div style="font-size:11px;color:var(--bone2);line-height:1.8;margin-bottom:12px;">
+          <strong style="color:var(--bone);">Purpose:</strong> Create a visual universe people want to live in. Before they know the brand, they know the feeling. Architecture, coffee, quiet ambition, industrial spaces, golden light.
+        </div>
+        <div style="font-size:11px;color:var(--bone2);line-height:1.8;margin-bottom:12px;">
+          <strong style="color:var(--bone);">Audience Psychology:</strong> People follow aesthetics first. They want to feel something. This pillar creates desire without selling anything.
+        </div>
+        <div class="section-title" style="font-size:8px;margin-bottom:10px;">Content Examples</div>
+        <ul class="pillar-list">
+          <li>Reel: 30s ambient morning shoot — coffee, light, silence. No talking. Music only.</li>
+          <li>Carousel: "5 spaces that inspired MAYXZ" — architectural photography breakdown</li>
+          <li>Static: Single frame, perfect composition, Groningen/travel city architecture</li>
+          <li>Story: Poll — "Which city feels MAYXZ?" (Amsterdam vs Tokyo vs Berlin)</li>
+          <li>Reel: City walk B-roll set to one perfect track, branded text overlay</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pillar-card border-brand">
+      <div class="pillar-header">
+        <div>
+          <div class="pillar-number">PILLAR 02</div>
+          <div class="pillar-name accent-brand">THE BUILD</div>
+        </div>
+        <div class="pillar-pct accent-brand">20%</div>
+      </div>
+      <div class="pillar-body">
+        <div style="font-size:11px;color:var(--bone2);line-height:1.8;margin-bottom:12px;">
+          <strong style="color:var(--bone);">Purpose:</strong> Show the brand being made in real-time. Audience becomes invested in the outcome because they watched it happen.
+        </div>
+        <div style="font-size:11px;color:var(--bone2);line-height:1.8;margin-bottom:12px;">
+          <strong style="color:var(--bone);">Audience Psychology:</strong> People root for what they watched being built. This creates loyalty that money can't buy. BUILDING IN SILENCE series lives here.
+        </div>
+        <div class="section-title" style="font-size:8px;margin-bottom:10px;">Content Examples</div>
+        <ul class="pillar-list">
+          <li>Reel: Fabric sample arrival — unboxing, feeling the material, no words</li>
+          <li>Carousel: Logo evolution — 10 rejected logos to the final mark</li>
+          <li>Reel: Screen recording + desk — designing the website in real-time</li>
+          <li>Story: "Which colorway?" vote — let audience shape the product</li>
+          <li>Reel: First sample try-on — 15 seconds, face not shown if desired</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pillar-card border-process">
+      <div class="pillar-header">
+        <div>
+          <div class="pillar-number">PILLAR 03</div>
+          <div class="pillar-name accent-process">THE PROCESS</div>
+        </div>
+        <div class="pillar-pct accent-process">15%</div>
+      </div>
+      <div class="pillar-body">
+        <div style="font-size:11px;color:var(--bone2);line-height:1.8;margin-bottom:12px;">
+          <strong style="color:var(--bone);">Purpose:</strong> Show the system and discipline behind the brand. Targets builders, creatives, designers. Builds massive credibility.
+        </div>
+        <div style="font-size:11px;color:var(--bone2);line-height:1.8;margin-bottom:12px;">
+          <strong style="color:var(--bone);">Audience Psychology:</strong> Creatives follow other creatives who show their work honestly. This attracts the most loyal and engaged followers.
+        </div>
+        <ul class="pillar-list">
+          <li>Reel: ADHD system breakdown — how you structure your day to build</li>
+          <li>Carousel: "How I write copy for MAYXZ" — actual creative process</li>
+          <li>Reel: Figma session — designing a drop layout, sped up, with audio</li>
+          <li>Story: Q&A — "ask me anything about building MAYXZ"</li>
+          <li>Reel: Morning planning ritual — notebook, coffee, tasks, 30 seconds</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pillar-card border-culture">
+      <div class="pillar-header">
+        <div>
+          <div class="pillar-number">PILLAR 04</div>
+          <div class="pillar-name accent-culture">THE CULTURE</div>
+        </div>
+        <div class="pillar-pct accent-culture">15%</div>
+      </div>
+      <div class="pillar-body">
+        <div style="font-size:11px;color:var(--bone2);line-height:1.8;margin-bottom:12px;">
+          <strong style="color:var(--bone);">Purpose:</strong> Position MAYXZ within a wider cultural conversation. Reference films, music, cities, architecture, concepts. Build intellectual brand identity.
+        </div>
+        <div style="font-size:11px;color:var(--bone2);line-height:1.8;margin-bottom:12px;">
+          <strong style="color:var(--bone);">Audience Psychology:</strong> People want to be part of something that has taste. This elevates MAYXZ beyond a brand into a cultural reference point.
+        </div>
+        <ul class="pillar-list">
+          <li>Carousel: "5 films that built MAYXZ's visual language"</li>
+          <li>Reel: City photography walk — reacting to architecture and space</li>
+          <li>Static: Quote from unexpected source paired with MAYXZ visual</li>
+          <li>Reel: "What discipline actually looks like" — short manifesto delivery</li>
+          <li>Carousel: Competitor analysis disguised as taste curation</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="pillar-card border-story" style="margin-bottom:24px;">
+    <div class="pillar-header">
+      <div>
+        <div class="pillar-number">PILLAR 05</div>
+        <div class="pillar-name accent-story">THE FOUNDER STORY</div>
+      </div>
+      <div class="pillar-pct accent-story">10%</div>
+    </div>
+    <div class="pillar-body">
+      <div style="font-size:11px;color:var(--bone2);line-height:1.8;margin-bottom:16px;">
+        <strong style="color:var(--bone);">Purpose:</strong> The deepest layer. Used strategically, not constantly. CPTSD, ADHD, ARFID, addiction overcome — never spoken directly. Shown through the work, the discipline, the transformation. People who relate will feel seen without you ever having to explain. This creates the most powerful emotional connection possible.
+      </div>
+      <div style="font-size:11px;color:var(--bone2);line-height:1.8;margin-bottom:16px;">
+        <strong style="color:var(--bone);">The Rule:</strong> Never perform vulnerability. Let the work be the proof. Drop a detail once per week maximum. Let the audience connect the dots. The mystery is the power.
+      </div>
+      <div class="grid-3" style="gap:12px;margin:0;">
+        <div>
+          <div class="section-title" style="font-size:8px;margin-bottom:10px;">What to show</div>
+          <ul class="pillar-list">
+            <li>5:30am desk shot with coffee — no explanation needed</li>
+            <li>"Building when I had nothing" — one line, no elaboration</li>
+            <li>Text overlay: "Year one. Nobody watching." Raw footage.</li>
+            <li>CHAPTERS series — one per week, 30–60 seconds</li>
+          </ul>
+        </div>
+        <div>
+          <div class="section-title" style="font-size:8px;margin-bottom:10px;">What NOT to show</div>
+          <ul class="pillar-list">
+            <li>Never say "I struggled with addiction"</li>
+            <li>Never make a post about mental health directly</li>
+            <li>Never preach recovery or use motivational language</li>
+            <li>Never ask for sympathy — only show results</li>
+          </ul>
+        </div>
+        <div>
+          <div class="section-title" style="font-size:8px;margin-bottom:10px;">Story Angles</div>
+          <ul class="pillar-list">
+            <li>"The person who builds MAYXZ is building himself too."</li>
+            <li>ADHD shown as hyperfocus, not a diagnosis</li>
+            <li>Silence as a former coping mechanism, now a superpower</li>
+            <li>Every product is proof something was overcome</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION: CALENDAR -->
+<!-- ============================================================ -->
+<div id="section-calendar" class="section">
+  <div class="page-header">
+    <h1>90-DAY CONTENT CALENDAR</h1>
+    <p>Week-by-week breakdown. Every slot is a template — fill with your actual content as you go.</p>
+  </div>
+
+  <!-- WEEKS 1-4 -->
+  <div class="week-block">
+    <div class="week-header">
+      <div class="week-label">WEEK 01 — Days 1–7</div>
+      <div class="week-focus">Focus: Establish aesthetic. First impressions. The world before the brand.</div>
+    </div>
+    <div class="week-grid">
+      <div class="day-cell">
+        <div class="day-name">MON</div>
+        <div class="day-num">01</div>
+        <div class="day-type">EARLY Series</div>
+        <div class="day-hook">"This is what 6am looks like when you're building something."</div>
+        <span class="day-tag tag-world">World</span>
+      </div>
+      <div class="day-cell">
+        <div class="day-name">TUE</div>
+        <div class="day-num">02</div>
+        <div class="day-type">Reel — Architecture</div>
+        <div class="day-hook">City walk. No talking. One perfect track. MAYXZ logo end card.</div>
+        <span class="day-tag tag-world">World</span>
+      </div>
+      <div class="day-cell">
+        <div class="day-name">WED</div>
+        <div class="day-num">03</div>
+        <div class="day-type">OFF — Film</div>
+        <div class="day-hook">Shoot day. Build backlog.</div>
+        <span class="day-tag tag-off">Film</span>
+      </div>
+      <div class="day-cell">
+        <div class="day-name">THU</div>
+        <div class="day-num">04</div>
+        <div class="day-type">PROCESS Carousel</div>
+        <div class="day-hook">"How I built MAYXZ with no money, no team, no experience."</div>
+        <span class="day-tag tag-brand">Brand</span>
+      </div>
+      <div class="day-cell">
+        <div class="day-name">FRI</div>
+        <div class="day-num">05</div>
+        <div class="day-type">PRESSURE CREATES CLARITY</div>
+        <div class="day-hook">"Pressure is not the enemy. It's the only filter that works."</div>
+        <span class="day-tag tag-story">Story</span>
+      </div>
+      <div class="day-cell">
+        <div class="day-name">SAT</div>
+        <div class="day-num">06</div>
+        <div class="day-type">Coffee + Desk Reel</div>
+        <div class="day-hook">Morning ritual. 25 seconds. Zero words. Pure atmosphere.</div>
+        <span class="day-tag tag-world">World</span>
+      </div>
+      <div class="day-cell">
+        <div class="day-name">SUN</div>
+        <div class="day-num">07</div>
+        <div class="day-type">Plan + Analytics</div>
+        <div class="day-hook">Review week. Plan next 7 days. No posting.</div>
+        <span class="day-tag tag-off">Review</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="week-block">
+    <div class="week-header">
+      <div class="week-label">WEEK 02 — Days 8–14</div>
+      <div class="week-focus">Focus: First CHAPTERS drop. Deepen visual language. Introduce brand hints.</div>
+    </div>
+    <div class="week-grid">
+      <div class="day-cell">
+        <div class="day-name">MON</div>
+        <div class="day-num">08</div>
+        <div class="day-type">EARLY Series</div>
+        <div class="day-hook">"Before the city wakes. This is where MAYXZ is built."</div>
+        <span class="day-tag tag-world">World</span>
+      </div>
+      <div class="day-cell">
+        <div class="day-name">TUE</div>
+        <div class="day-num">09</div>
+        <div class="day-type">CHAPTERS 01</div>
+        <div class="day-hook">"Before the name. Before anything. There was just a question."</div>
+        <span class="day-tag tag-story">Story</span>
+      </div>
+      <div class="day-cell">
+        <div class="day-name">WED</div>
+        <div class="day-num">10</div>
+        <div class="day-type">Film Day</div>
+        <div class="day-hook">Shoot architecture, product details, B-roll batch.</div>
+        <span class="day-tag tag-off">Film</span>
+      </div>
+      <div class="day-cell">
+        <div class="day-name">THU</div>
+        <div class="day-num">11</div>
+        <div class="day-type">BUILDING IN SILENCE 01</div>
+        <div class="day-hook">Logo process — sketch to final. No explanation.</div>
+        <span class="day-tag tag-brand">Brand</span>
+      </div>
+      <div class="day-cell">
+        <div class="day-name">FRI</div>
+        <div class="day-num">12</div>
+        <div class="day-type">Culture Reel</div>
+        <div class="day-hook">"5 films that made me think differently about building."</div>
+        <span class="day-tag tag-world">World</span>
+      </div>
+      <div class="day-cell">
+        <div class="day-name">SAT</div>
+        <div class="day-num">13</div>
+        <div class="day-type">Aesthetic Static</div>
+        <div class="day-hook">One frame. Perfect light. MAYXZ text. No caption needed.</div>
+        <span class="day-tag tag-world">World</span>
+      </div>
+      <div class="day-cell">
+        <div class="day-name">SUN</div>
+        <div class="day-num">14</div>
+        <div class="day-type">Analytics + Plan</div>
+        <div class="day-hook">What worked. What didn't. Adjust week 3.</div>
+        <span class="day-tag tag-off">Review</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="week-block">
+    <div class="week-header">
+      <div class="week-label">WEEK 03 — Days 15–21</div>
+      <div class="week-focus">Focus: First product tease. Deepen CHAPTERS. Push reel frequency.</div>
+    </div>
+    <div class="week-grid">
+      <div class="day-cell"><div class="day-name">MON</div><div class="day-num">15</div><div class="day-type">EARLY Reel</div><div class="day-hook">"The city is still sleeping. We are not." — ambient morning</div><span class="day-tag tag-world">World</span></div>
+      <div class="day-cell"><div class="day-name">TUE</div><div class="day-num">16</div><div class="day-type">PROCESS Carousel</div><div class="day-hook">"How I built a brand with ADHD and no blueprint."</div><span class="day-tag tag-story">Story</span></div>
+      <div class="day-cell"><div class="day-name">WED</div><div class="day-num">17</div><div class="day-type">Film Day</div><div class="day-hook">First product sample shots. Clothing details, no reveal.</div><span class="day-tag tag-off">Film</span></div>
+      <div class="day-cell"><div class="day-name">THU</div><div class="day-num">18</div><div class="day-type">Product Tease</div><div class="day-hook">One shot. Fabric texture. No context. Just beauty.</div><span class="day-tag tag-brand">Brand</span></div>
+      <div class="day-cell"><div class="day-name">FRI</div><div class="day-num">19</div><div class="day-type">PCC Series</div><div class="day-hook">"Silence isn't giving up. It's loading."</div><span class="day-tag tag-story">Story</span></div>
+      <div class="day-cell"><div class="day-name">SAT</div><div class="day-num">20</div><div class="day-type">City Walk Reel</div><div class="day-hook">Architecture walk. Groningen or nearby city. Brand music.</div><span class="day-tag tag-world">World</span></div>
+      <div class="day-cell"><div class="day-name">SUN</div><div class="day-num">21</div><div class="day-type">Review</div><div class="day-hook">3-week checkpoint. Adjust strategy if needed.</div><span class="day-tag tag-off">Review</span></div>
+    </div>
+  </div>
+
+  <div class="week-block">
+    <div class="week-header">
+      <div class="week-label">WEEKS 04–06 — Days 22–42</div>
+      <div class="week-focus">Focus: Momentum phase. ONE DAY series launch. 2nd sample drop.</div>
+    </div>
+    <div class="week-grid">
+      <div class="day-cell"><div class="day-name">WK4 MON</div><div class="day-num">22</div><div class="day-type">ONE DAY 01</div><div class="day-hook">"A full day building MAYXZ. From 6am." 60s reel.</div><span class="day-tag tag-brand">Brand</span></div>
+      <div class="day-cell"><div class="day-name">WK4 WED</div><div class="day-num">24</div><div class="day-type">CHAPTERS 02</div><div class="day-hook">"Why I build. Not for validation. For something else."</div><span class="day-tag tag-story">Story</span></div>
+      <div class="day-cell"><div class="day-name">WK4 FRI</div><div class="day-num">26</div><div class="day-type">BIS 02</div><div class="day-hook">Sample 2 arrives. No words. Real reaction.</div><span class="day-tag tag-brand">Brand</span></div>
+      <div class="day-cell"><div class="day-name">WK5 MON</div><div class="day-num">29</div><div class="day-type">EARLY</div><div class="day-hook">"30 days in. Still here. Still building."</div><span class="day-tag tag-story">Story</span></div>
+      <div class="day-cell"><div class="day-name">WK5 THU</div><div class="day-num">32</div><div class="day-type">Culture</div><div class="day-hook">"The brands that shaped MAYXZ's DNA."</div><span class="day-tag tag-world">World</span></div>
+      <div class="day-cell"><div class="day-name">WK6 TUE</div><div class="day-num">37</div><div class="day-type">PROCESS</div><div class="day-hook">"Building the website. Live. No script."</div><span class="day-tag tag-brand">Brand</span></div>
+      <div class="day-cell"><div class="day-name">WK6 FRI</div><div class="day-num">40</div><div class="day-type">PCC 02</div><div class="day-hook">"The builder's paradox: the quieter you are, the louder the work."</div><span class="day-tag tag-story">Story</span></div>
+    </div>
+  </div>
+
+  <div class="week-block">
+    <div class="week-header">
+      <div class="week-label">WEEKS 07–10 — Days 43–70</div>
+      <div class="week-focus">Focus: Authority phase. Waitlist teaser. Drop announcement prep. Push 5K.</div>
+    </div>
+    <div class="week-grid">
+      <div class="day-cell"><div class="day-name">WK7</div><div class="day-num">43</div><div class="day-type">CHAPTERS 03</div><div class="day-hook">"The silence period. What it cost. What it gave."</div><span class="day-tag tag-story">Story</span></div>
+      <div class="day-cell"><div class="day-name">WK7</div><div class="day-num">46</div><div class="day-type">Waitlist Tease</div><div class="day-hook">"Something is coming. No date. No details. Just a name."</div><span class="day-tag tag-brand">Brand</span></div>
+      <div class="day-cell"><div class="day-name">WK8</div><div class="day-num">50</div><div class="day-type">ONE DAY 02</div><div class="day-hook">"Travel day. Documenting MAYXZ from another city."</div><span class="day-tag tag-world">World</span></div>
+      <div class="day-cell"><div class="day-name">WK8</div><div class="day-num">53</div><div class="day-type">BIS 03</div><div class="day-hook">Website goes live. Real-time reaction shot.</div><span class="day-tag tag-brand">Brand</span></div>
+      <div class="day-cell"><div class="day-name">WK9</div><div class="day-num">57</div><div class="day-type">CHAPTERS 04</div><div class="day-hook">"Pressure doesn't break builders. It reveals them."</div><span class="day-tag tag-story">Story</span></div>
+      <div class="day-cell"><div class="day-name">WK9</div><div class="day-num">60</div><div class="day-type">60-Day Mark</div><div class="day-hook">"60 days of building in public. What changed."</div><span class="day-tag tag-story">Story</span></div>
+      <div class="day-cell"><div class="day-name">WK10</div><div class="day-num">65</div><div class="day-type">Drop Countdown</div><div class="day-hook">"Drop 001. Coming." — one frame, black bg, text only.</div><span class="day-tag tag-brand">Brand</span></div>
+    </div>
+  </div>
+
+  <div class="week-block">
+    <div class="week-header">
+      <div class="week-label">WEEKS 11–13 — Days 71–90</div>
+      <div class="week-focus">Focus: Launch mode. Drop 001. Full story arc closure. 10K push.</div>
+    </div>
+    <div class="week-grid">
+      <div class="day-cell"><div class="day-name">WK11</div><div class="day-num">71</div><div class="day-type">CHAPTERS 05</div><div class="day-hook">"The outsider's edge. Why being outside gave me everything."</div><span class="day-tag tag-story">Story</span></div>
+      <div class="day-cell"><div class="day-name">WK11</div><div class="day-num">74</div><div class="day-type">Product Reveal</div><div class="day-hook">First full product shots. Editorial format. No price. Pure image.</div><span class="day-tag tag-brand">Brand</span></div>
+      <div class="day-cell"><div class="day-name">WK12</div><div class="day-num">78</div><div class="day-type">ONE DAY 03</div><div class="day-hook">"Drop day. What the day of a launch actually looks like."</div><span class="day-tag tag-world">World</span></div>
+      <div class="day-cell"><div class="day-name">WK12</div><div class="day-num">80</div><div class="day-type">LAUNCH</div><div class="day-hook">"Drop 001 is live. Link in bio." — minimal, confident.</div><span class="day-tag tag-brand">Brand</span></div>
+      <div class="day-cell"><div class="day-name">WK13</div><div class="day-num">84</div><div class="day-type">Post-Drop CHAPTERS</div><div class="day-hook">"90 days ago I had nothing but an idea and a system."</div><span class="day-tag tag-story">Story</span></div>
+      <div class="day-cell"><div class="day-name">WK13</div><div class="day-num">87</div><div class="day-type">EARLY Special</div><div class="day-hook">"Day 87. Still here. Still building. This is just the beginning."</div><span class="day-tag tag-world">World</span></div>
+      <div class="day-cell"><div class="day-name">WK13</div><div class="day-num">90</div><div class="day-type">90-Day Recap</div><div class="day-hook">"90 days. 0 to __K. Drop 001 sold. MAYXZ is real now."</div><span class="day-tag tag-story">Story</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION: TRACKER -->
+<!-- ============================================================ -->
+<div id="section-tracker" class="section">
+  <div class="page-header">
+    <h1>CONTENT TRACKER</h1>
+    <p>Every post. Every status. Every performance note. Add rows as you go.</p>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi-item">
+      <div class="kpi-label">Total Ideas Logged</div>
+      <div class="kpi-val" id="t-ideas">0</div>
+      <div class="kpi-target">Add ideas below ↓</div>
+    </div>
+    <div class="kpi-item">
+      <div class="kpi-label">In Production</div>
+      <div class="kpi-val" id="t-prod">0</div>
+      <div class="kpi-target">Filming or editing</div>
+    </div>
+    <div class="kpi-item">
+      <div class="kpi-label">Ready to Post</div>
+      <div class="kpi-val" id="t-ready">0</div>
+      <div class="kpi-target">Edited, approved</div>
+    </div>
+    <div class="kpi-item">
+      <div class="kpi-label">Posted (Total)</div>
+      <div class="kpi-val" id="t-posted">0</div>
+      <div class="kpi-target">Live on platform</div>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="content-table" id="tracker-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Idea / Title</th>
+          <th>Priority</th>
+          <th>Pillar</th>
+          <th>Series</th>
+          <th>Type</th>
+          <th>Filmed</th>
+          <th>Edited</th>
+          <th>Posted</th>
+          <th>Platform</th>
+          <th>Hook</th>
+          <th>Performance</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody id="tracker-body">
+        <tr>
+          <td style="color:var(--graphite2);">001</td>
+          <td class="hl">EARLY 01 — Morning Ritual</td>
+          <td><span class="priority p-high">HIGH</span></td>
+          <td><span style="color:#8a77ff;font-size:9px;">World</span></td>
+          <td style="color:var(--graphite);font-size:10px;">EARLY</td>
+          <td><span class="badge badge-reel">Reel</span></td>
+          <td><span style="color:var(--graphite2);font-size:10px;">—</span></td>
+          <td><span style="color:var(--graphite2);font-size:10px;">—</span></td>
+          <td><span style="color:var(--graphite2);font-size:10px;">—</span></td>
+          <td style="color:var(--graphite);font-size:10px;">IG + TT</td>
+          <td style="font-size:10px;color:var(--bone2);font-style:italic;">"This is what 6am looks like..."</td>
+          <td style="color:var(--graphite2);font-size:10px;">—</td>
+          <td style="color:var(--graphite);font-size:10px;">Film Wed</td>
+        </tr>
+        <tr>
+          <td style="color:var(--graphite2);">002</td>
+          <td class="hl">CHAPTERS 01 — Before The Name</td>
+          <td><span class="priority p-high">HIGH</span></td>
+          <td><span style="color:var(--signal2);font-size:9px;">Story</span></td>
+          <td style="color:var(--graphite);font-size:10px;">CHAPTERS</td>
+          <td><span class="badge badge-reel">Reel</span></td>
+          <td><span style="color:var(--graphite2);font-size:10px;">—</span></td>
+          <td><span style="color:var(--graphite2);font-size:10px;">—</span></td>
+          <td><span style="color:var(--graphite2);font-size:10px;">—</span></td>
+          <td style="color:var(--graphite);font-size:10px;">IG + TT</td>
+          <td style="font-size:10px;color:var(--bone2);font-style:italic;">"Before the name. Before anything."</td>
+          <td style="color:var(--graphite2);font-size:10px;">—</td>
+          <td style="color:var(--graphite);font-size:10px;">Week 2</td>
+        </tr>
+        <tr>
+          <td style="color:var(--graphite2);">003</td>
+          <td class="hl">BIS 01 — Logo Process</td>
+          <td><span class="priority p-high">HIGH</span></td>
+          <td><span style="color:var(--electric2);font-size:9px;">Build</span></td>
+          <td style="color:var(--graphite);font-size:10px;">BUILDING IN SILENCE</td>
+          <td><span class="badge badge-carousel">Carousel</span></td>
+          <td><span style="color:var(--graphite2);font-size:10px;">—</span></td>
+          <td><span style="color:var(--graphite2);font-size:10px;">—</span></td>
+          <td><span style="color:var(--graphite2);font-size:10px;">—</span></td>
+          <td style="color:var(--graphite);font-size:10px;">IG</td>
+          <td style="font-size:10px;color:var(--bone2);font-style:italic;">"10 logos they never saw. 1 that made it."</td>
+          <td style="color:var(--graphite2);font-size:10px;">—</td>
+          <td style="color:var(--graphite);font-size:10px;">Screencap needed</td>
+        </tr>
+        <tr>
+          <td style="color:var(--graphite2);">004</td>
+          <td class="hl">PCC 01 — Pressure is a filter</td>
+          <td><span class="priority p-med">MED</span></td>
+          <td><span style="color:var(--signal2);font-size:9px;">Story</span></td>
+          <td style="color:var(--graphite);font-size:10px;">PRESSURE CREATES CLARITY</td>
+          <td><span class="badge badge-reel">Reel</span></td>
+          <td><span style="color:var(--graphite2);font-size:10px;">—</span></td>
+          <td><span style="color:var(--graphite2);font-size:10px;">—</span></td>
+          <td><span style="color:var(--graphite2);font-size:10px;">—</span></td>
+          <td style="color:var(--graphite);font-size:10px;">IG + TT</td>
+          <td style="font-size:10px;color:var(--bone2);font-style:italic;">"Pressure is not the enemy."</td>
+          <td style="color:var(--graphite2);font-size:10px;">—</td>
+          <td style="color:var(--graphite);font-size:10px;">Text overlay reel</td>
+        </tr>
+        <tr>
+          <td colspan="13" style="text-align:center;color:var(--graphite2);font-size:10px;padding:20px;">
+            ↑ Edit this HTML file to add your own rows. Copy any row and paste below. ↑
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- STATUS LEGEND -->
+  <div style="display:flex;gap:16px;flex-wrap:wrap;">
+    <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:var(--graphite);">
+      <span class="status-dot s-idea"></span>IDEA
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:var(--graphite);">
+      <span class="status-dot s-shoot"></span>FILMING
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:var(--graphite);">
+      <span class="status-dot s-edit"></span>EDITING
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:var(--graphite);">
+      <span class="status-dot s-ready"></span>READY
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:var(--graphite);">
+      <span class="status-dot s-live"></span>LIVE
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION: SHOT LIBRARY -->
+<!-- ============================================================ -->
+<div id="section-shots" class="section">
+  <div class="page-header">
+    <h1>SHOT LIBRARY</h1>
+    <p>Reusable shots database. Film these in batches. Use across all content.</p>
+  </div>
+
+  <!-- COFFEE -->
+  <div class="shot-category">
+    <div class="shot-header">
+      <div class="shot-icon">☕</div>
+      <div class="shot-cat-name">COFFEE</div>
+      <div class="shot-count">12 SHOTS</div>
+    </div>
+    <div class="shot-body">
+      <div class="shot-col">
+        <div class="shot-col-title">Exact Shots</div>
+        <div class="shot-item">Espresso dropping into cup — macro, overhead</div>
+        <div class="shot-item">Steam rising — backlit, dark background</div>
+        <div class="shot-item">Cup on concrete surface — morning light</div>
+        <div class="shot-item">Hands wrapping around cup — no face</div>
+        <div class="shot-item">French press plunge — slow motion</div>
+        <div class="shot-item">Coffee and open notebook — side angle</div>
+      </div>
+      <div class="shot-col">
+        <div class="shot-col-title">Camera Angles</div>
+        <div class="shot-item">Overhead 90° — clean flat lay</div>
+        <div class="shot-item">Eye level — shallow depth of field</div>
+        <div class="shot-item">Close macro — 5cm from cup</div>
+        <div class="shot-item">Side profile — steam as subject</div>
+        <div class="shot-item">Through window — city bg blur</div>
+      </div>
+      <div class="shot-col">
+        <div class="shot-col-title">B-Roll + Transitions</div>
+        <div class="shot-item">Swipe reveal: coffee → city view</div>
+        <div class="shot-item">Match cut: steam → city fog/morning mist</div>
+        <div class="shot-item">Time lapse: cup emptying as day starts</div>
+        <div class="shot-item">Sound design: pour sound → city ambience</div>
+        <div class="shot-item">Text overlay: "06:14. Still quiet."</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARCHITECTURE -->
+  <div class="shot-category">
+    <div class="shot-header">
+      <div class="shot-icon">🏛</div>
+      <div class="shot-cat-name">ARCHITECTURE</div>
+      <div class="shot-count">15 SHOTS</div>
+    </div>
+    <div class="shot-body">
+      <div class="shot-col">
+        <div class="shot-col-title">Exact Shots</div>
+        <div class="shot-item">Brutalist concrete wall — texture close-up</div>
+        <div class="shot-item">Staircase — looking up through spiral</div>
+        <div class="shot-item">Geometric shadow pattern on floor</div>
+        <div class="shot-item">Empty hallway — centered, symmetrical</div>
+        <div class="shot-item">Glass facade reflecting city</div>
+        <div class="shot-item">Industrial pipe/beam detail — overhead light</div>
+        <div class="shot-item">Person (back to camera) vs. massive building</div>
+      </div>
+      <div class="shot-col">
+        <div class="shot-col-title">Camera Angles</div>
+        <div class="shot-item">Low angle — looking up at corner of building</div>
+        <div class="shot-item">Rule of thirds — subject off-center</div>
+        <div class="shot-item">Extreme symmetry — dead center frame</div>
+        <div class="shot-item">Walking through, handheld natural motion</div>
+        <div class="shot-item">Static locked — no movement, let life pass</div>
+      </div>
+      <div class="shot-col">
+        <div class="shot-col-title">B-Roll + Transitions</div>
+        <div class="shot-item">Slow pan across concrete texture</div>
+        <div class="shot-item">Match cut: building corner → clothing edge seam</div>
+        <div class="shot-item">Time of day: same location dawn vs dusk</div>
+        <div class="shot-item">Walking away shot — figure in architecture</div>
+        <div class="shot-item">Whip pan: fast movement to reveal building</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLOTHING + PRODUCT -->
+  <div class="shot-category">
+    <div class="shot-header">
+      <div class="shot-icon">👕</div>
+      <div class="shot-cat-name">CLOTHING + PRODUCT DETAILS</div>
+      <div class="shot-count">18 SHOTS</div>
+    </div>
+    <div class="shot-body">
+      <div class="shot-col">
+        <div class="shot-col-title">Exact Shots</div>
+        <div class="shot-item">Fabric texture — macro lens, tight crop</div>
+        <div class="shot-item">Logo detail — side lighting to show emboss</div>
+        <div class="shot-item">Stitching close-up — quality storytelling</div>
+        <div class="shot-item">Sleeve cuff fold — editorial flat</div>
+        <div class="shot-item">Full garment hang — negative space bg</div>
+        <div class="shot-item">Worn look — person standing, back to camera</div>
+        <div class="shot-item">Packaging — box unboxing, no talking</div>
+        <div class="shot-item">Label/tag detail — close, good light</div>
+      </div>
+      <div class="shot-col">
+        <div class="shot-col-title">Camera Angles</div>
+        <div class="shot-item">Flat lay overhead — clean, editorial</div>
+        <div class="shot-item">On-body — torso crop, no face needed</div>
+        <div class="shot-item">Hanging — natural movement in slight breeze</div>
+        <div class="shot-item">Detail zoom — start wide, push in slowly</div>
+        <div class="shot-item">Low perspective — worn pieces, ground angle</div>
+      </div>
+      <div class="shot-col">
+        <div class="shot-col-title">B-Roll + Transitions</div>
+        <div class="shot-item">Pull focus: product sharp → bg blur</div>
+        <div class="shot-item">Slow motion: fabric drop or fold</div>
+        <div class="shot-item">Match cut: fabric texture → concrete wall</div>
+        <div class="shot-item">Sound design: box open sound → silence</div>
+        <div class="shot-item">3-angle quick cut: label → stitch → full piece</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LAPTOP / DESK / CREATIVE WORK -->
+  <div class="shot-category">
+    <div class="shot-header">
+      <div class="shot-icon">💻</div>
+      <div class="shot-cat-name">DESK + CREATIVE WORK</div>
+      <div class="shot-count">14 SHOTS</div>
+    </div>
+    <div class="shot-body">
+      <div class="shot-col">
+        <div class="shot-col-title">Exact Shots</div>
+        <div class="shot-item">Overhead desk setup — clean, branded</div>
+        <div class="shot-item">Laptop screen — Figma/Shopify open, angled</div>
+        <div class="shot-item">Hands typing — keyboard focused, fast cut</div>
+        <div class="shot-item">Notebook and pen — writing copy or plans</div>
+        <div class="shot-item">Phone on desk — beside coffee, morning</div>
+        <div class="shot-item">Screen recording — designing in real-time</div>
+      </div>
+      <div class="shot-col">
+        <div class="shot-col-title">Camera Angles</div>
+        <div class="shot-item">Over-shoulder — looking at screen with you</div>
+        <div class="shot-item">Side angle — laptop glow on face silhouette</div>
+        <div class="shot-item">Overhead 45° — desk as composition</div>
+        <div class="shot-item">Extreme close — fingertip on trackpad</div>
+      </div>
+      <div class="shot-col">
+        <div class="shot-col-title">B-Roll + Transitions</div>
+        <div class="shot-item">Time lapse: desk session, 2 hours → 10s</div>
+        <div class="shot-item">Screen → real product: match cut</div>
+        <div class="shot-item">Sped up typing: productivity feeling</div>
+        <div class="shot-item">Ambient audio: keys, coffee, city outside</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NIGHT SHOTS -->
+  <div class="shot-category">
+    <div class="shot-header">
+      <div class="shot-icon">🌙</div>
+      <div class="shot-cat-name">NIGHT + LATE SHOTS</div>
+      <div class="shot-count">10 SHOTS</div>
+    </div>
+    <div class="shot-body">
+      <div class="shot-col">
+        <div class="shot-col-title">Exact Shots</div>
+        <div class="shot-item">Desk at midnight — lamp glow only</div>
+        <div class="shot-item">City street at night — wet pavement reflections</div>
+        <div class="shot-item">Coffee shop closing time — last person working</div>
+        <div class="shot-item">Screen glow on face — no lights on</div>
+        <div class="shot-item">Window at night — city lights behind</div>
+      </div>
+      <div class="shot-col">
+        <div class="shot-col-title">Camera Angles</div>
+        <div class="shot-item">Low ISO — embrace grain, it's aesthetic</div>
+        <div class="shot-item">Long exposure: street lights, trails</div>
+        <div class="shot-item">Backlight: silhouette against bright window</div>
+        <div class="shot-item">Tight crop — only lamp and hands visible</div>
+      </div>
+      <div class="shot-col">
+        <div class="shot-col-title">B-Roll + Transitions</div>
+        <div class="shot-item">Night → morning: same location, time jump</div>
+        <div class="shot-item">Text: "23:47. Still not done."</div>
+        <div class="shot-item">Slow pan: desk to window to city</div>
+        <div class="shot-item">Rain on window — atmosphere shot</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION: REEL SYSTEM -->
+<!-- ============================================================ -->
+<div id="section-reels" class="section">
+  <div class="page-header">
+    <h1>REEL SYSTEM</h1>
+    <p>Proven reel concepts. Hook → sequence → CTA. Film these in order of difficulty.</p>
+  </div>
+
+  <div class="section-title">Beginner Reels — Film First</div>
+  <div class="grid-3" style="margin-bottom:24px;">
+    <div class="reel-card">
+      <div class="reel-num">R001</div>
+      <div class="reel-hook">"This is what 6am looks like when you're building something."</div>
+      <div class="reel-meta">
+        <span class="reel-pill reel-diff-1">Easy</span>
+        <span class="badge badge-reel">Reel</span>
+        <span style="font-size:8px;color:var(--graphite);">15–25s</span>
+      </div>
+      <div class="reel-seq">Shot 1: Coffee pour close-up<br>Shot 2: Steam rising, backlit<br>Shot 3: Hands wrap cup<br>Shot 4: Notebook open<br>Shot 5: MAYXZ text end card<br><br>CTA: "Follow for the world we're building."</div>
+    </div>
+    <div class="reel-card">
+      <div class="reel-num">R002</div>
+      <div class="reel-hook">"No office. No team. No investors. Just this."</div>
+      <div class="reel-meta">
+        <span class="reel-pill reel-diff-1">Easy</span>
+        <span class="badge badge-reel">Reel</span>
+        <span style="font-size:8px;color:var(--graphite);">20–30s</span>
+      </div>
+      <div class="reel-seq">Shot 1: Laptop on desk — wide<br>Shot 2: Screen close (Figma/Shopify)<br>Shot 3: Coffee beside laptop<br>Shot 4: Outside window — city<br>Shot 5: Back to work shot<br><br>CTA: "This is how MAYXZ gets built."</div>
+    </div>
+    <div class="reel-card">
+      <div class="reel-num">R003</div>
+      <div class="reel-hook">"Silence isn't giving up. It's loading."</div>
+      <div class="reel-meta">
+        <span class="reel-pill reel-diff-1">Easy</span>
+        <span class="badge badge-reel">Reel</span>
+        <span style="font-size:8px;color:var(--graphite);">15s</span>
+      </div>
+      <div class="reel-seq">Black screen 1s → text appears<br>Shot: Building facade — slow pan<br>Text overlay: "BUILDING IN SILENCE"<br>MAYXZ logo reveal end<br><br>CTA: None. Let it breathe.</div>
+    </div>
+    <div class="reel-card">
+      <div class="reel-num">R004</div>
+      <div class="reel-hook">"Everyone is watching someone build. Nobody is building."</div>
+      <div class="reel-meta">
+        <span class="reel-pill reel-diff-1">Easy</span>
+        <span class="badge badge-reel">Reel</span>
+        <span style="font-size:8px;color:var(--graphite);">20s</span>
+      </div>
+      <div class="reel-seq">Shot 1: City street, people on phones<br>Shot 2: Your desk with work open<br>Shot 3: Product sample on table<br>Text: "This is the difference."<br><br>CTA: "Are you watching or building?"</div>
+    </div>
+    <div class="reel-card">
+      <div class="reel-num">R005</div>
+      <div class="reel-hook">"What does the brand you're building actually look like?"</div>
+      <div class="reel-meta">
+        <span class="reel-pill reel-diff-1">Easy</span>
+        <span class="badge badge-carousel">Carousel</span>
+        <span style="font-size:8px;color:var(--graphite);">8 slides</span>
+      </div>
+      <div class="reel-seq">Slide 1: Bold hook text only<br>Slides 2–7: MAYXZ mood board — architecture, coffee, concrete, fabric<br>Slide 8: "This is MAYXZ. Follow the build."<br><br>CTA: "Save this if you understand the aesthetic."</div>
+    </div>
+    <div class="reel-card">
+      <div class="reel-num">R006</div>
+      <div class="reel-hook">"I built this brand with ADHD. Here's what that actually looks like."</div>
+      <div class="reel-meta">
+        <span class="reel-pill reel-diff-1">Easy</span>
+        <span class="badge badge-reel">Reel</span>
+        <span style="font-size:8px;color:var(--graphite);">30–45s</span>
+      </div>
+      <div class="reel-seq">Shot 1: Multiple browser tabs open chaos<br>Shot 2: Notebook with messy notes<br>Shot 3: System/dashboard — clean order<br>Shot 4: Product result<br>Text overlays: "Chaos → System → Output"<br><br>CTA: "The chaos is part of the process."</div>
+    </div>
+  </div>
+
+  <div class="section-title">Intermediate Reels — Week 2+</div>
+  <div class="grid-3" style="margin-bottom:24px;">
+    <div class="reel-card">
+      <div class="reel-num">R007</div>
+      <div class="reel-hook">"How I went from nothing to a brand in 30 days."</div>
+      <div class="reel-meta">
+        <span class="reel-pill reel-diff-2">Medium</span>
+        <span class="badge badge-reel">Reel</span>
+        <span style="font-size:8px;color:var(--graphite);">45–60s</span>
+      </div>
+      <div class="reel-seq">Structure: Day 1 vs Day 30 comparison<br>Quick cuts: sketch → logo → product → website<br>Music: Build tension with beat drop<br>Text pacing: one word per cut<br>End: product held up, logo visible<br><br>CTA: "Day 90 is coming. You won't want to miss it."</div>
+    </div>
+    <div class="reel-card">
+      <div class="reel-num">R008</div>
+      <div class="reel-hook">"The brand that feels like a building feels like MAYXZ."</div>
+      <div class="reel-meta">
+        <span class="reel-pill reel-diff-2">Medium</span>
+        <span class="badge badge-reel">Reel</span>
+        <span style="font-size:8px;color:var(--graphite);">20–30s</span>
+      </div>
+      <div class="reel-seq">Architecture shots cut to product shots<br>Match cuts: concrete texture → fabric texture<br>Steel beam → brand color<br>Empty building → brand space<br>Music: cinematic, minimal<br><br>CTA: "Architecture inspires everything we make."</div>
+    </div>
+    <div class="reel-card">
+      <div class="reel-num">R009</div>
+      <div class="reel-hook">"What nobody tells you about building a fashion brand from scratch."</div>
+      <div class="reel-meta">
+        <span class="reel-pill reel-diff-2">Medium</span>
+        <span class="badge badge-carousel">Carousel</span>
+        <span style="font-size:8px;color:var(--graphite);">10 slides</span>
+      </div>
+      <div class="reel-seq">Slide 1: Bold claim hook<br>Slides 2–9: One brutal truth per slide — short, sharp<br>Slide 10: "MAYXZ. Built with all of this in mind."<br><br>CTA: "Save this if you're building something."</div>
+    </div>
+    <div class="reel-card">
+      <div class="reel-num">R010</div>
+      <div class="reel-hook">"I have [ADHD/CPTSD/ARFID] and I'm building a luxury brand."</div>
+      <div class="reel-meta">
+        <span class="reel-pill reel-diff-2">Medium</span>
+        <span class="badge badge-reel">Reel</span>
+        <span style="font-size:8px;color:var(--graphite);">45s</span>
+      </div>
+      <div class="reel-seq">Use this ONE TIME in Phase 2 for massive reach.<br>Voiceover: calm, confident, no self-pity<br>Footage: desk, work, product — show proof<br>Never say "struggle" — say "system"<br>End: "The diagnosis isn't the story. The work is."<br><br>CTA: "Follow the build."</div>
+    </div>
+    <div class="reel-card">
+      <div class="reel-num">R011</div>
+      <div class="reel-hook">"3 brands that built a world before they sold anything."</div>
+      <div class="reel-meta">
+        <span class="reel-pill reel-diff-2">Medium</span>
+        <span class="badge badge-carousel">Carousel</span>
+        <span style="font-size:8px;color:var(--graphite);">8 slides</span>
+      </div>
+      <div class="reel-seq">Slide 1: Hook<br>Slides 2–7: Fear of God / ALD / Represent — breakdown<br>Slide 8: "MAYXZ is next." Bold, confident.<br><br>CTA: "This is the blueprint we're following."</div>
+    </div>
+    <div class="reel-card">
+      <div class="reel-num">R012</div>
+      <div class="reel-hook">"A full day building MAYXZ. 6am to midnight."</div>
+      <div class="reel-meta">
+        <span class="reel-pill reel-diff-2">Medium</span>
+        <span class="badge badge-reel">Reel</span>
+        <span style="font-size:8px;color:var(--graphite);">60–90s</span>
+      </div>
+      <div class="reel-seq">ONE DAY format. Documentary feel.<br>Morning: coffee, desk, plan<br>Midday: design/work session<br>Afternoon: city walk / shoot<br>Evening: editing, late desk<br>End: product, quiet, done.<br><br>CTA: "This is what building looks like."</div>
+    </div>
+  </div>
+
+  <div class="section-title">Advanced / Viral Attempts — Phase 2+</div>
+  <div class="grid-3">
+    <div class="reel-card">
+      <div class="reel-num">R013</div>
+      <div class="reel-hook">"I spent 3 months in silence. Here's what I built."</div>
+      <div class="reel-meta">
+        <span class="reel-pill reel-diff-3">Advanced</span>
+        <span class="badge badge-reel">Reel</span>
+        <span style="font-size:8px;color:var(--graphite);">60s</span>
+      </div>
+      <div class="reel-seq">CHAPTERS format. Cinematic.<br>No voiceover — text only overlays<br>Footage: product, desk, city, architecture<br>Build to a reveal at the end<br>Music: one track, no cuts<br><br>CTA: "The silence is over."</div>
+    </div>
+    <div class="reel-card">
+      <div class="reel-num">R014</div>
+      <div class="reel-hook">"I'm building a brand that doesn't feel like a brand."</div>
+      <div class="reel-meta">
+        <span class="reel-pill reel-diff-3">Advanced</span>
+        <span class="badge badge-reel">Reel</span>
+        <span style="font-size:8px;color:var(--graphite);">45s</span>
+      </div>
+      <div class="reel-seq">Contrast cuts: other brands (generic) → MAYXZ world<br>Text: "Most brands sell products."<br>"MAYXZ builds worlds."<br>Architecture, coffee, late nights, product<br>End: MAYXZ logo, slow fade<br><br>CTA: "Follow if you want something different."</div>
+    </div>
+    <div class="reel-card">
+      <div class="reel-num">R015</div>
+      <div class="reel-hook">"Drop 001. Coming." — (Announcement reel)</div>
+      <div class="reel-meta">
+        <span class="reel-pill reel-diff-3">Advanced</span>
+        <span class="badge badge-reel">Reel</span>
+        <span style="font-size:8px;color:var(--graphite);">30s</span>
+      </div>
+      <div class="reel-seq">All best footage compiled — 90 days of world<br>Quick cuts escalating to product reveal<br>One word per beat<br>Final frame: product + date<br>Music: perfect drop timing<br><br>CTA: "Waitlist in bio. Limited."</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION: HOOKS + CAPTIONS -->
+<!-- ============================================================ -->
+<div id="section-hooks" class="section">
+  <div class="page-header">
+    <h1>HOOKS + CAPTIONS</h1>
+    <p>Proven hooks that stop the scroll. Captions that make them stay.</p>
+  </div>
+
+  <div class="hooks-section">
+    <div class="hooks-header">
+      <div class="hooks-title">REEL HOOKS — Scroll Stoppers</div>
+      <div style="font-size:9px;color:var(--graphite);">First 3 words matter most. Hook = reason to keep watching.</div>
+    </div>
+    <div class="hook-row">
+      <div class="hook-text">"Nobody builds like this anymore."</div>
+      <div class="hook-type">Curiosity / Contrast</div>
+      <div class="hook-why">Implies secret knowledge</div>
+    </div>
+    <div class="hook-row">
+      <div class="hook-text">"I stopped explaining. The work started speaking."</div>
+      <div class="hook-type">Transformation</div>
+      <div class="hook-why">Founder identity, relatable</div>
+    </div>
+    <div class="hook-row">
+      <div class="hook-text">"What a brand looks like before it's famous."</div>
+      <div class="hook-type">Exclusivity / Behind-scenes</div>
+      <div class="hook-why">FOMO — early access feeling</div>
+    </div>
+    <div class="hook-row">
+      <div class="hook-text">"This brand is being built in real time. Watch."</div>
+      <div class="hook-type">Invitation / Documentary</div>
+      <div class="hook-why">Pulls audience in as witnesses</div>
+    </div>
+    <div class="hook-row">
+      <div class="hook-text">"Most brands are loud. MAYXZ is quiet. Here's why."</div>
+      <div class="hook-type">Contrast / Philosophy</div>
+      <div class="hook-why">Creates brand identity in one line</div>
+    </div>
+    <div class="hook-row">
+      <div class="hook-text">"I built this with ADHD, no money, and a system."</div>
+      <div class="hook-type">Personal Story / Proof</div>
+      <div class="hook-why">High relatability, massive reach potential</div>
+    </div>
+    <div class="hook-row">
+      <div class="hook-text">"The designer who got into school with a portfolio, not grades."</div>
+      <div class="hook-type">Origin story</div>
+      <div class="hook-why">Underdog hook — widely relatable</div>
+    </div>
+    <div class="hook-row">
+      <div class="hook-text">"What 6am looks like when you're building something real."</div>
+      <div class="hook-type">Lifestyle / Discipline</div>
+      <div class="hook-why">Aspirational + grounded</div>
+    </div>
+    <div class="hook-row">
+      <div class="hook-text">"Pressure creates clarity. This brand is proof."</div>
+      <div class="hook-type">Philosophy / Series</div>
+      <div class="hook-why">Ties to recurring series identity</div>
+    </div>
+    <div class="hook-row">
+      <div class="hook-text">"Before this drop sells out — here's the full story."</div>
+      <div class="hook-type">Urgency / Narrative</div>
+      <div class="hook-why">Launch phase hook — high conversion</div>
+    </div>
+    <div class="hook-row">
+      <div class="hook-text">"I don't post every day. When I do, it means something."</div>
+      <div class="hook-type">Scarcity / Quality signal</div>
+      <div class="hook-why">Sets expectation of high-value content</div>
+    </div>
+    <div class="hook-row">
+      <div class="hook-text">"They said the brand was too minimal. I said perfect."</div>
+      <div class="hook-type">Confidence / Conviction</div>
+      <div class="hook-why">Attracts taste-driven audience</div>
+    </div>
+    <div class="hook-row">
+      <div class="hook-text">"Architecture is the brand. The clothes are just proof."</div>
+      <div class="hook-type">Brand Philosophy</div>
+      <div class="hook-why">Positions MAYXZ as world, not product</div>
+    </div>
+    <div class="hook-row">
+      <div class="hook-text">"Year one. No team. No budget. No excuses."</div>
+      <div class="hook-type">Grit / Documentary</div>
+      <div class="hook-why">Founder mythology — long engagement</div>
+    </div>
+    <div class="hook-row">
+      <div class="hook-text">"The quietest brand in the room is usually the most dangerous."</div>
+      <div class="hook-type">Philosophy / Tension</div>
+      <div class="hook-why">Shareable line — comment bait</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-title">Captions That Convert</div>
+  <div class="grid-2">
+    <div class="caption-card">
+      <div class="caption-pillar">EARLY SERIES — World Building Caption</div>
+      <div class="caption-text">
+        "06:11.<br>
+        Coffee's done.<br>
+        The city hasn't started yet.<br><br>
+        This is the best hour.<br>
+        Before the noise.<br>
+        Before the opinions.<br><br>
+        MAYXZ gets built in here."
+      </div>
+      <div class="caption-cta">CTA: Follow the build. Link in bio.</div>
+    </div>
+    <div class="caption-card">
+      <div class="caption-pillar">BUILDING IN SILENCE — Brand Caption</div>
+      <div class="caption-text">
+        "They asked when the brand launches.<br><br>
+        I said when it's ready.<br><br>
+        Not when it's good enough.<br>
+        When it's <em>right</em>.<br><br>
+        MAYXZ is being built to last, not to trend."
+      </div>
+      <div class="caption-cta">CTA: Save this if you're building something too.</div>
+    </div>
+    <div class="caption-card">
+      <div class="caption-pillar">CHAPTERS — Founder Story Caption</div>
+      <div class="caption-text">
+        "There was a version of me that had nothing.<br><br>
+        No system. No direction. No plan.<br><br>
+        That version built MAYXZ anyway.<br><br>
+        Because when you have nothing to lose,<br>
+        you build everything."
+      </div>
+      <div class="caption-cta">CTA: Chapter 02 drops Thursday.</div>
+    </div>
+    <div class="caption-card">
+      <div class="caption-pillar">PRESSURE CREATES CLARITY — Philosophy Caption</div>
+      <div class="caption-text">
+        "Pressure doesn't break builders.<br><br>
+        It removes everything that was never part of the structure.<br><br>
+        What survives the pressure — that's the real brand."
+      </div>
+      <div class="caption-cta">CTA: Follow if this hit different.</div>
+    </div>
+    <div class="caption-card">
+      <div class="caption-pillar">PRODUCT TEASE — Drop Caption</div>
+      <div class="caption-text">
+        "Drop 001.<br><br>
+        90 days of building.<br>
+        Countless rejected ideas.<br>
+        One thing that's right.<br><br>
+        Soon."
+      </div>
+      <div class="caption-cta">CTA: Waitlist opens [date]. Link in bio.</div>
+    </div>
+    <div class="caption-card">
+      <div class="caption-pillar">PROCESS — System Thinking Caption</div>
+      <div class="caption-text">
+        "ADHD means your brain is everywhere at once.<br><br>
+        So I built a system that works with that, not against it.<br><br>
+        The chaos became the engine.<br>
+        The engine built MAYXZ."
+      </div>
+      <div class="caption-cta">CTA: Follow to see how the system works.</div>
+    </div>
+  </div>
+
+  <!-- HASHTAG STRATEGY -->
+  <div class="divider"></div>
+  <div class="section-title">Hashtag Strategy</div>
+  <div class="card">
+    <div style="font-size:11px;color:var(--bone2);line-height:2;margin-bottom:12px;">
+      <strong style="color:var(--bone);">Rule:</strong> 15–25 tags per post. Always in <em>first comment</em>, never caption. Mix of sizes: 40% micro (10k–100k), 40% mid (100k–500k), 20% large (500k+).
+    </div>
+    <div class="grid-3" style="gap:12px;margin:0;">
+      <div>
+        <div class="shot-col-title">World / Aesthetic</div>
+        <div style="font-size:10px;color:var(--graphite);line-height:2;">
+          #architecturephotography<br>#brutalistarchitecture<br>#coffeeaesthetic<br>#industrialdesign<br>#urbanphotography<br>#minimalaesthetic<br>#concreteandsteel<br>#architecturelovers
+        </div>
+      </div>
+      <div>
+        <div class="shot-col-title">Fashion / Brand</div>
+        <div style="font-size:10px;color:var(--graphite);line-height:2;">
+          #streetwear<br>#streetstyle<br>#independentbrand<br>#fashionphotography<br>#luxurystreet<br>#mensfashion<br>#brandbuilding<br>#fashionbrand<br>#emergingbrand
+        </div>
+      </div>
+      <div>
+        <div class="shot-col-title">Builder / Founder</div>
+        <div style="font-size:10px;color:var(--graphite);line-height:2;">
+          #entrepreneurmindset<br>#brandfounder<br>#buildinginpublic<br>#creativeentrepreneur<br>#adhdentrepreneur<br>#startuplife<br>#founderjourney<br>#contentcreator<br>#selftaught
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION: CONTENT ENGINE -->
+<!-- ============================================================ -->
+<div id="section-engine" class="section">
+  <div class="page-header">
+    <h1>CONTENT ENGINE</h1>
+    <p>1 piece of content → 7 outputs. Film once. Distribute everywhere.</p>
+  </div>
+
+  <div class="section-title">Engine: One Reel → 7 Pieces</div>
+
+  <div class="engine-flow" style="margin-bottom:16px;">
+    <div class="engine-source">
+      <div class="engine-label">SOURCE</div>
+      <div class="engine-title">1 Filmed Reel<br><span style="font-size:9px;color:var(--graphite);font-weight:400;">e.g. EARLY series reel, 30s</span></div>
+    </div>
+    <div class="engine-outputs">
+      <div class="engine-output">
+        <div class="engine-output-type">Output 1</div>
+        <div class="engine-output-title">Instagram Reel</div>
+        <ul class="engine-output-steps">
+          <li>Full edited version, 9:16</li>
+          <li>Hook text in first 3 frames</li>
+          <li>Branded end card</li>
+          <li>Caption + CTA in first comment</li>
+        </ul>
+      </div>
+      <div class="engine-output">
+        <div class="engine-output-type">Output 2</div>
+        <div class="engine-output-title">TikTok Version</div>
+        <ul class="engine-output-steps">
+          <li>Repost same video</li>
+          <li>Add TikTok-native text hook</li>
+          <li>Slightly different caption angle</li>
+          <li>Post 24h after IG</li>
+        </ul>
+      </div>
+      <div class="engine-output">
+        <div class="engine-output-type">Output 3</div>
+        <div class="engine-output-title">5x Stories</div>
+        <ul class="engine-output-steps">
+          <li>Behind-the-shoot clip</li>
+          <li>Poll: "Which is your fave shot?"</li>
+          <li>Screenshot of best comment</li>
+          <li>One quote from caption</li>
+          <li>Link sticker to profile</li>
+        </ul>
+      </div>
+      <div class="engine-output">
+        <div class="engine-output-type">Output 4</div>
+        <div class="engine-output-title">YouTube Short</div>
+        <ul class="engine-output-steps">
+          <li>Same 9:16 version</li>
+          <li>Upload as Short</li>
+          <li>Extended description with brand story</li>
+          <li>Tags: streetwear, brand building</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="engine-flow" style="margin-bottom:24px;">
+    <div class="engine-source">
+      <div class="engine-label">CONTINUED FROM</div>
+      <div class="engine-title">Same Reel<br><span style="font-size:9px;color:var(--graphite);font-weight:400;">Additional outputs</span></div>
+    </div>
+    <div class="engine-outputs">
+      <div class="engine-output">
+        <div class="engine-output-type">Output 5</div>
+        <div class="engine-output-title">Pinterest Pin</div>
+        <ul class="engine-output-steps">
+          <li>Best single frame from reel</li>
+          <li>MAYXZ text overlay</li>
+          <li>Title: searchable phrase</li>
+          <li>Link to IG or website</li>
+        </ul>
+      </div>
+      <div class="engine-output">
+        <div class="engine-output-type">Output 6</div>
+        <div class="engine-output-title">Thread / X</div>
+        <ul class="engine-output-steps">
+          <li>Expand caption into thread</li>
+          <li>Tweet 1: Hook line</li>
+          <li>Tweet 2–4: Behind the idea</li>
+          <li>Tweet 5: Link to full reel</li>
+        </ul>
+      </div>
+      <div class="engine-output">
+        <div class="engine-output-type">Output 7</div>
+        <div class="engine-output-title">Carousel (IG)</div>
+        <ul class="engine-output-steps">
+          <li>3–5 still frames from reel</li>
+          <li>Add quote text overlays</li>
+          <li>Different caption angle</li>
+          <li>Post 3–4 days after reel</li>
+        </ul>
+      </div>
+      <div class="engine-output" style="background:var(--void3);">
+        <div class="engine-output-type">Bonus</div>
+        <div class="engine-output-title">Archive File</div>
+        <ul class="engine-output-steps">
+          <li>Save raw clip to cloud</li>
+          <li>Tag: series / pillar / date</li>
+          <li>Reuse in future compilations</li>
+          <li>Use for ONE DAY format</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- STORY SYSTEM -->
+  <div class="section-title">Daily Story Framework</div>
+  <div class="grid-3">
+    <div class="story-frame">
+      <div class="story-time-header">
+        <div class="story-clock">06:00–10:00</div>
+        <div class="story-period">Morning</div>
+      </div>
+      <div class="story-items">
+        <div class="story-item">
+          <div class="story-item-type">Story 1 — Environment</div>
+          <div class="story-item-text">Morning desk/coffee shot. Minimal text. No face needed.</div>
+          <div class="story-item-why">Sets the daily tone. Creates routine visibility.</div>
+        </div>
+        <div class="story-item">
+          <div class="story-item-type">Story 2 — Engagement</div>
+          <div class="story-item-text">Poll: "Coffee first or work first?" or "Desk setup or café today?"</div>
+          <div class="story-item-why">Drives replies → boosts reach algorithm.</div>
+        </div>
+        <div class="story-item">
+          <div class="story-item-type">Story 3 — Today's Plan</div>
+          <div class="story-item-text">Notebook or list: "Today: [3 tasks]". Minimal, clean screenshot.</div>
+          <div class="story-item-why">Shows discipline. People watch for the update.</div>
+        </div>
+      </div>
+    </div>
+    <div class="story-frame">
+      <div class="story-time-header">
+        <div class="story-clock">12:00–17:00</div>
+        <div class="story-period">Afternoon</div>
+      </div>
+      <div class="story-items">
+        <div class="story-item">
+          <div class="story-item-type">Story 4 — Process</div>
+          <div class="story-item-text">Work in progress — screen, design, or product. "Building [X]".</div>
+          <div class="story-item-why">Shows the build. Creates investment in outcome.</div>
+        </div>
+        <div class="story-item">
+          <div class="story-item-type">Story 5 — Question Box</div>
+          <div class="story-item-text">"Ask me anything about MAYXZ." Once per week.</div>
+          <div class="story-item-why">Max engagement. Content mining for future reels.</div>
+        </div>
+        <div class="story-item">
+          <div class="story-item-type">Story 6 — Taste Curation</div>
+          <div class="story-item-text">Screenshot of something inspiring — film, architecture, music. Short caption.</div>
+          <div class="story-item-why">Cultural positioning. Shows what MAYXZ is influenced by.</div>
+        </div>
+      </div>
+    </div>
+    <div class="story-frame">
+      <div class="story-time-header">
+        <div class="story-clock">19:00–23:00</div>
+        <div class="story-period">Evening</div>
+      </div>
+      <div class="story-items">
+        <div class="story-item">
+          <div class="story-item-type">Story 7 — Day Recap</div>
+          <div class="story-item-text">One sentence: "Built X today. Shipped nothing. Getting closer."</div>
+          <div class="story-item-why">Completion loop. Audience comes back tomorrow.</div>
+        </div>
+        <div class="story-item">
+          <div class="story-item-type">Story 8 — Ambient</div>
+          <div class="story-item-text">Late night desk. Lamp. City outside. No text. Let it breathe.</div>
+          <div class="story-item-why">Pure atmosphere. The most shared MAYXZ stories.</div>
+        </div>
+        <div class="story-item">
+          <div class="story-item-type">Story 9 — Content Push</div>
+          <div class="story-item-text">Reshare today's reel with added context or behind-scenes clip.</div>
+          <div class="story-item-why">Extends reel lifespan. 2nd audience window.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION: WEEKLY OS -->
+<!-- ============================================================ -->
+<div id="section-os" class="section">
+  <div class="page-header">
+    <h1>WEEKLY OPERATING SYSTEM</h1>
+    <p>Every week runs on this structure. Protect it. The system makes the brand.</p>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:16px;">
+    <div class="os-day">
+      <div class="os-day-header">
+        <div class="os-day-name">MONDAY</div>
+        <div class="os-day-type dt-plan">PLAN + POST</div>
+      </div>
+      <div class="os-timeline">
+        <div class="time-block">
+          <div class="time-label">06:00</div>
+          <div><div class="time-task">Morning ritual. Coffee. Notebook. No phone.</div><div class="time-note">Protect this hour. It's the brand.</div></div>
+        </div>
+        <div class="time-block">
+          <div class="time-label">07:00</div>
+          <div><div class="time-task">Review last week's analytics. What performed. What didn't. 20 minutes max.</div></div>
+        </div>
+        <div class="time-block">
+          <div class="time-label">08:00</div>
+          <div><div class="time-task">Plan this week's 5 posts. Confirm pillar split: 70/20/10.</div><div class="time-note">Fill tracker. Set priority order.</div></div>
+        </div>
+        <div class="time-block">
+          <div class="time-label">10:00</div>
+          <div><div class="time-task">Post EARLY series reel. First comment with hashtags immediately.</div></div>
+        </div>
+        <div class="time-block">
+          <div class="time-label">12:00</div>
+          <div><div class="time-task">School / design work. Brand building work session.</div></div>
+        </div>
+        <div class="time-block">
+          <div class="time-label">18:00</div>
+          <div><div class="time-task">Evening story sequence. 3 stories: desk + insight + ambient.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="os-day">
+      <div class="os-day-header">
+        <div class="os-day-name">TUESDAY</div>
+        <div class="os-day-type dt-post">POST + ENGAGE</div>
+      </div>
+      <div class="os-timeline">
+        <div class="time-block">
+          <div class="time-label">06:00</div>
+          <div><div class="time-task">Morning ritual. Stories: coffee + today's focus.</div></div>
+        </div>
+        <div class="time-block">
+          <div class="time-label">10:00</div>
+          <div><div class="time-task">Post second content piece. Architecture, culture, or carousel.</div></div>
+        </div>
+        <div class="time-block">
+          <div class="time-label">11:00</div>
+          <div><div class="time-task">Reply to ALL comments from Monday's post. 100% response rate in first 24hrs.</div><div class="time-note">Algorithm boost. Community signals.</div></div>
+        </div>
+        <div class="time-block">
+          <div class="time-label">14:00</div>
+          <div><div class="time-task">Engage with 20 accounts in your niche. Comment thoughtfully. Never generic.</div></div>
+        </div>
+        <div class="time-block">
+          <div class="time-label">19:00</div>
+          <div><div class="time-task">Evening story. Question box or ambient night shot.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:16px;">
+    <div class="os-day">
+      <div class="os-day-header">
+        <div class="os-day-name">WEDNESDAY</div>
+        <div class="os-day-type dt-film">FILM DAY</div>
+      </div>
+      <div class="os-timeline">
+        <div class="time-block">
+          <div class="time-label">06:00</div>
+          <div><div class="time-task">Film morning ritual shots. Best light of the day.</div><div class="time-note">Coffee, desk, notebook — 20 clips minimum.</div></div>
+        </div>
+        <div class="time-block">
+          <div class="time-label">09:00</div>
+          <div><div class="time-task">City/architecture shoot. Walk with purpose. 30+ clips.</div><div class="time-note">Always film more than you think you need.</div></div>
+        </div>
+        <div class="time-block">
+          <div class="time-label">13:00</div>
+          <div><div class="time-task">Product and desk detail shots. Flat lays, macro, textures.</div></div>
+        </div>
+        <div class="time-block">
+          <div class="time-label">16:00</div>
+          <div><div class="time-task">Review footage. Organize into folders: EARLY / ARCH / PRODUCT / DESK / MISC.</div></div>
+        </div>
+        <div class="time-block">
+          <div class="time-label">19:00</div>
+          <div><div class="time-task">Late night ambient shots if possible. Same location, different light.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="os-day">
+      <div class="os-day-header">
+        <div class="os-day-name">THURSDAY</div>
+        <div class="os-day-type dt-edit">EDIT DAY</div>
+      </div>
+      <div class="os-timeline">
+        <div class="time-block">
+          <div class="time-label">07:00</div>
+          <div><div class="time-task">Select best 10 clips from Wednesday's shoot. Cull hard.</div><div class="time-note">Keep only what's visually perfect.</div></div>
+        </div>
+        <div class="time-block">
+          <div class="time-label">08:00</div>
+          <div><div class="time-task">Edit Reel 1: sequence, music, text overlays, color grade.</div><div class="time-note">Color grade: lift blacks, reduce saturation, warm shadows slightly.</div></div>
+        </div>
+        <div class="time-block">
+          <div class="time-label">11:00</div>
+          <div><div class="time-task">Edit Reel 2 or Carousel. Write captions for both.</div></div>
+        </div>
+        <div class="time-block">
+          <div class="time-label">14:00</div>
+          <div><div class="time-task">Export all pieces. Review on phone. Does it look right in feed?</div></div>
+        </div>
+        <div class="time-block">
+          <div class="time-label">17:00</div>
+          <div><div class="time-task">Queue Friday and Saturday posts in scheduled drafts.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-3">
+    <div class="os-day">
+      <div class="os-day-header">
+        <div class="os-day-name">FRIDAY</div>
+        <div class="os-day-type dt-post">POST — HIGH REACH</div>
+      </div>
+      <div class="os-timeline">
+        <div class="time-block">
+          <div class="time-label">09:00</div>
+          <div><div class="time-task">Post best content of the week. Friday 9–11am = highest reach window.</div></div>
+        </div>
+        <div class="time-block">
+          <div class="time-label">12:00</div>
+          <div><div class="time-task">Engage hard. Reply every comment. DM anyone who shares.</div></div>
+        </div>
+        <div class="time-block">
+          <div class="time-label">16:00</div>
+          <div><div class="time-task">Shoot anything new — weekend prep. Travel if possible.</div></div>
+        </div>
+        <div class="time-block">
+          <div class="time-label">20:00</div>
+          <div><div class="time-task">CHAPTERS or PROCESS story series. Best deep content on Friday nights.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="os-day">
+      <div class="os-day-header">
+        <div class="os-day-name">SATURDAY</div>
+        <div class="os-day-type dt-film">FILM + CREATIVE</div>
+      </div>
+      <div class="os-timeline">
+        <div class="time-block">
+          <div class="time-label">07:00</div>
+          <div><div class="time-task">Longer film session. New locations. More ambitious shots.</div><div class="time-note">Saturday is for the shots nobody else gets.</div></div>
+        </div>
+        <div class="time-block">
+          <div class="time-label">11:00</div>
+          <div><div class="time-task">Post aesthetic content. Simple, beautiful. Saturday audience is scrolling for inspiration.</div></div>
+        </div>
+        <div class="time-block">
+          <div class="time-label">14:00</div>
+          <div><div class="time-task">Creative work session — MAYXZ design, website, copy.</div></div>
+        </div>
+        <div class="time-block">
+          <div class="time-label">20:00</div>
+          <div><div class="time-task">Night shots. City at night. Best ambient content.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="os-day">
+      <div class="os-day-header">
+        <div class="os-day-name">SUNDAY</div>
+        <div class="os-day-type dt-analytics">ANALYTICS + PLAN</div>
+      </div>
+      <div class="os-timeline">
+        <div class="time-block">
+          <div class="time-label">10:00</div>
+          <div><div class="time-task">Weekly analytics review. What was the top performer. Why.</div></div>
+        </div>
+        <div class="time-block">
+          <div class="time-label">11:00</div>
+          <div><div class="time-task">Update tracker. Mark all this week's posts as Live.</div></div>
+        </div>
+        <div class="time-block">
+          <div class="time-label">12:00</div>
+          <div><div class="time-task">Next week planning. Choose 5 posts. Assign days. Confirm pillars.</div></div>
+        </div>
+        <div class="time-block">
+          <div class="time-label">14:00</div>
+          <div><div class="time-task">REST. MAYXZ needs you mentally present. Protect Sunday afternoons.</div><div class="time-note">The brand is built by a person. Rest is part of the OS.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION: GEAR -->
+<!-- ============================================================ -->
+<div id="section-gear" class="section">
+  <div class="page-header">
+    <h1>GEAR LIST</h1>
+    <p>What you actually need. In order of priority. Start lean. Build up.</p>
+  </div>
+
+  <div class="grid-2">
+    <div class="gear-card">
+      <div class="gear-header"><div class="gear-category">📱 PHASE 01 — Start Now</div></div>
+      <div class="gear-item">
+        <div><div class="gear-name">iPhone (current model) or Samsung S-series</div><div class="gear-why">4K 60fps. Good enough to go viral. Don't wait for a camera.</div></div>
+        <div class="gear-price">Have it</div>
+        <div class="gear-priority gp-must">MUST</div>
+      </div>
+      <div class="gear-item">
+        <div><div class="gear-name">CapCut (Free) — Mobile Editor</div><div class="gear-why">Best for fast reel editing on phone. Beat sync. Text overlays.</div></div>
+        <div class="gear-price">Free</div>
+        <div class="gear-priority gp-must">MUST</div>
+      </div>
+      <div class="gear-item">
+        <div><div class="gear-name">Lightroom Mobile (Free)</div><div class="gear-why">Color grading. Create one preset. Apply to every shot for visual consistency.</div></div>
+        <div class="gear-price">Free</div>
+        <div class="gear-priority gp-must">MUST</div>
+      </div>
+      <div class="gear-item">
+        <div><div class="gear-name">DJI OM 6 Gimbal</div><div class="gear-why">Eliminates shakiness. Makes phone footage look cinematic. Game changer.</div></div>
+        <div class="gear-price">~€139</div>
+        <div class="gear-priority gp-must">MUST</div>
+      </div>
+      <div class="gear-item">
+        <div><div class="gear-name">Small LED Panel (Ulanzi VL49)</div><div class="gear-why">Desk and product shots. Warm light. Dark scene filler. €25 well spent.</div></div>
+        <div class="gear-price">~€25</div>
+        <div class="gear-priority gp-need">NEED</div>
+      </div>
+      <div class="gear-item">
+        <div><div class="gear-name">Mini Tripod / Gorilla Pod</div><div class="gear-why">Static locked shots. Time lapses. Over-desk overhead angles.</div></div>
+        <div class="gear-price">~€20–40</div>
+        <div class="gear-priority gp-must">MUST</div>
+      </div>
+    </div>
+
+    <div class="gear-card">
+      <div class="gear-header"><div class="gear-category">🎬 PHASE 02 — Upgrade (Month 2)</div></div>
+      <div class="gear-item">
+        <div><div class="gear-name">Sony ZV-E10 or ZV-1 Mark II</div><div class="gear-why">APS-C sensor. Interchangeable lens. Cinematic color. First real camera.</div></div>
+        <div class="gear-price">€550–750</div>
+        <div class="gear-priority gp-need">NEED</div>
+      </div>
+      <div class="gear-item">
+        <div><div class="gear-name">Sony 35mm f/1.8 Lens</div><div class="gear-why">Shallow depth. Beautiful bokeh. Street and desk shots. The one lens you need.</div></div>
+        <div class="gear-price">~€380</div>
+        <div class="gear-priority gp-need">NEED</div>
+      </div>
+      <div class="gear-item">
+        <div><div class="gear-name">DaVinci Resolve (Free)</div><div class="gear-why">Professional color grading. Better than Premiere for color work. Free forever.</div></div>
+        <div class="gear-price">Free</div>
+        <div class="gear-priority gp-need">NEED</div>
+      </div>
+      <div class="gear-item">
+        <div><div class="gear-name">Rode VideoMicro</div><div class="gear-why">Clean ambient sound for CHAPTERS and PROCESS reels. Massive quality jump.</div></div>
+        <div class="gear-price">~€60</div>
+        <div class="gear-priority gp-need">NEED</div>
+      </div>
+      <div class="gear-item">
+        <div><div class="gear-name">Portable Hard Drive 1TB</div><div class="gear-why">Store all raw footage. Never lose a shoot. Cloud backup separately.</div></div>
+        <div class="gear-price">~€50</div>
+        <div class="gear-priority gp-need">NEED</div>
+      </div>
+    </div>
+
+    <div class="gear-card">
+      <div class="gear-header"><div class="gear-category">👕 SAMPLES + PRODUCTION</div></div>
+      <div class="gear-item">
+        <div><div class="gear-name">First Sample Order (1–3 pieces)</div><div class="gear-why">Don't need inventory. Need product for shoots. Order samples from supplier.</div></div>
+        <div class="gear-price">€100–300</div>
+        <div class="gear-priority gp-must">MUST</div>
+      </div>
+      <div class="gear-item">
+        <div><div class="gear-name">Shipping boxes (branded)</div><div class="gear-why">Unboxing content. Even for samples. The packaging IS content.</div></div>
+        <div class="gear-price">€30–80</div>
+        <div class="gear-priority gp-need">NEED</div>
+      </div>
+      <div class="gear-item">
+        <div><div class="gear-name">Fabric swatches from supplier</div><div class="gear-why">Free from most suppliers. Great detail shots. Shows quality process.</div></div>
+        <div class="gear-price">Free–€20</div>
+        <div class="gear-priority gp-must">MUST</div>
+      </div>
+      <div class="gear-item">
+        <div><div class="gear-name">Woven labels / hang tags (50 pcs)</div><div class="gear-why">Even on samples, branded labels change the feeling completely.</div></div>
+        <div class="gear-price">€30–60</div>
+        <div class="gear-priority gp-need">NEED</div>
+      </div>
+    </div>
+
+    <div class="gear-card">
+      <div class="gear-header"><div class="gear-category">💎 PHASE 03 — 10K+ Level</div></div>
+      <div class="gear-item">
+        <div><div class="gear-name">Sony A7C II or Canon R8</div><div class="gear-why">Full-frame. Editorial shoots. When revenue supports it.</div></div>
+        <div class="gear-price">€1800–2400</div>
+        <div class="gear-priority gp-nice">LATER</div>
+      </div>
+      <div class="gear-item">
+        <div><div class="gear-name">Adobe Creative Suite</div><div class="gear-why">Premiere + After Effects for polished brand videos.</div></div>
+        <div class="gear-price">~€55/mo</div>
+        <div class="gear-priority gp-nice">LATER</div>
+      </div>
+      <div class="gear-item">
+        <div><div class="gear-name">Aputure 120D Light</div><div class="gear-why">Studio-grade lighting. Editorial product photography.</div></div>
+        <div class="gear-price">~€350</div>
+        <div class="gear-priority gp-nice">LATER</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION: EDIT GUIDE -->
+<!-- ============================================================ -->
+<div id="section-edit" class="section">
+  <div class="page-header">
+    <h1>EDITING GUIDE</h1>
+    <p>How to edit every MAYXZ video. Exact settings. Exact process.</p>
+  </div>
+
+  <div class="section-title">Color Grading — The MAYXZ Look</div>
+  <div class="card" style="margin-bottom:24px;">
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:16px;">
+      <div style="text-align:center;">
+        <div style="height:40px;background:#0a0a0a;border-radius:4px;border:1px solid var(--border);margin-bottom:6px;"></div>
+        <div style="font-size:9px;color:var(--graphite);letter-spacing:0.1em;">VOID BLACK</div>
+        <div style="font-size:8px;color:var(--graphite2);">#0A0A0A</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="height:40px;background:#e8e2d9;border-radius:4px;border:1px solid var(--border);margin-bottom:6px;"></div>
+        <div style="font-size:9px;color:var(--graphite);letter-spacing:0.1em;">BONE</div>
+        <div style="font-size:8px;color:var(--graphite2);">#E8E2D9</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="height:40px;background:#555555;border-radius:4px;border:1px solid var(--border);margin-bottom:6px;"></div>
+        <div style="font-size:9px;color:var(--graphite);letter-spacing:0.1em;">GRAPHITE</div>
+        <div style="font-size:8px;color:var(--graphite2);">#555555</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="height:40px;background:#c4a882;border-radius:4px;border:1px solid var(--border);margin-bottom:6px;"></div>
+        <div style="font-size:9px;color:var(--graphite);letter-spacing:0.1em;">SAND</div>
+        <div style="font-size:8px;color:var(--graphite2);">#C4A882</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="height:40px;background:#cc3322;border-radius:4px;border:1px solid var(--border);margin-bottom:6px;"></div>
+        <div style="font-size:9px;color:var(--graphite);letter-spacing:0.1em;">SIGNAL RED</div>
+        <div style="font-size:8px;color:var(--graphite2);">#CC3322</div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--bone2);line-height:1.8;">
+      <strong style="color:var(--bone);">The look in 5 settings (Lightroom/CapCut):</strong><br>
+      Exposure: -0.3 to -0.5 (slightly underexposed, moodier) · Contrast: +20 · Highlights: -40 · Shadows: +15 (lifted, cinematic) · Whites: -20 · Blacks: -10 · Saturation: -15 to -25 (desaturated) · Vibrance: -10 · Temperature: +8 (warmer) · Tint: +3 (slight green push for gritty feel)
+    </div>
+  </div>
+
+  <div class="section-title">Reel Editing Steps — CapCut / Premiere</div>
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:24px;">
+    <div class="edit-step">
+      <div class="edit-num">01</div>
+      <div><div class="edit-title">Import + Cull</div><div class="edit-desc">Import all clips. Watch everything once. Delete anything below 8/10 quality. Be ruthless. Bad clips kill reels.</div><div class="edit-spec">Target: Keep 30–40% of what you filmed.</div></div>
+    </div>
+    <div class="edit-step">
+      <div class="edit-num">02</div>
+      <div><div class="edit-title">Choose Your Music First</div><div class="edit-desc">Music determines the edit. Find the track before you cut anything. The beat tells you where to cut.</div><div class="edit-spec">Sources: Artlist, Epidemic Sound, CapCut library. Cinematic, minimal, no lyrics for ambient reels.</div></div>
+    </div>
+    <div class="edit-step">
+      <div class="edit-num">03</div>
+      <div><div class="edit-title">Cut to the Beat</div><div class="edit-desc">Every clip change happens ON a beat hit or between beats. Never random. The rhythm creates the feeling.</div><div class="edit-spec">EARLY series: slow cuts (3–5s per clip). PROCESS: fast cuts (0.5–1.5s). PCC: 1 word per cut.</div></div>
+    </div>
+    <div class="edit-step">
+      <div class="edit-num">04</div>
+      <div><div class="edit-title">Color Grade — Apply Preset</div><div class="edit-desc">Apply MAYXZ preset to all clips. Adjust exposure clip-by-clip if lighting is inconsistent. Consistency > perfection.</div><div class="edit-spec">Save preset once. Apply everywhere. Never skip this.</div></div>
+    </div>
+    <div class="edit-step">
+      <div class="edit-num">05</div>
+      <div><div class="edit-title">Text Overlays</div><div class="edit-desc">Font: Unbounded or similar geometric sans-serif. Size: large. Color: white or bone. Position: bottom left or centered. Never top. Never right.</div><div class="edit-spec">Max 5–7 words per overlay. Stay on screen for 1–2 beats. Fade in only — no bounce, no effects.</div></div>
+    </div>
+    <div class="edit-step">
+      <div class="edit-num">06</div>
+      <div><div class="edit-title">Hook Frame — First 1–3 Seconds</div><div class="edit-desc">First frame must stop the scroll. Best shot first OR text hook first, then footage. Never start with a boring wide shot.</div><div class="edit-spec">Rule: If you wouldn't stop scrolling for the first frame, cut it and use a better one.</div></div>
+    </div>
+    <div class="edit-step">
+      <div class="edit-num">07</div>
+      <div><div class="edit-title">End Card</div><div class="edit-desc">Last 1–2 seconds: MAYXZ logo or text on dark/black background. Consistent on every reel. Builds brand recognition.</div><div class="edit-spec">Simple fade to black → logo. No animation needed.</div></div>
+    </div>
+    <div class="edit-step">
+      <div class="edit-num">08</div>
+      <div><div class="edit-title">Export Settings</div><div class="edit-desc">1080×1920 (9:16). 30fps for ambient. 60fps for action/walking. Quality: Highest. Always export at full quality, then let platform compress.</div><div class="edit-spec">CapCut: 1080p export. File under 500MB. Check on phone screen before posting.</div></div>
+    </div>
+  </div>
+
+  <div class="section-title">Audio Rules</div>
+  <div class="card">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+      <div>
+        <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--graphite2);margin-bottom:10px;">AMBIENT REELS (EARLY, WORLD)</div>
+        <ul class="pillar-list">
+          <li>Music vol: 70–80%. Subtle, present but not dominant.</li>
+          <li>No voiceover. Let the visuals and music carry it.</li>
+          <li>Natural ambient sound optional: city noise under music</li>
+          <li>Beat drop = reveal moment or best shot</li>
+        </ul>
+      </div>
+      <div>
+        <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--graphite2);margin-bottom:10px;">PROCESS + STORY REELS</div>
+        <ul class="pillar-list">
+          <li>Voiceover or text: always one or the other, not both</li>
+          <li>If voiceover: calm, slow, deliberate pacing. No hype.</li>
+          <li>Music lower: 40–60% when speaking</li>
+          <li>Keyboard/ambient sound is content, don't remove it</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer-note">
+  <span>M4YXZ</span> CONTENT OPERATING SYSTEM · Built for the build · v1.0 · 2024
+</div>
+
+</div><!-- /main -->
+
+<script>
+  function showSection(name) {
+    // Hide all
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+
+    // Show target
+    document.getElementById('section-' + name).classList.add('active');
+
+    // Activate tab
+    const tabs = document.querySelectorAll('.nav-tab');
+    const order = ['dashboard','pillars','calendar','tracker','shots','reels','hooks','engine','os','gear','edit'];
+    const idx = order.indexOf(name);
+    if (idx >= 0 && tabs[idx]) tabs[idx].classList.add('active');
+
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Animate progress bars on load
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.querySelectorAll('.progress-fill').forEach(bar => {
+        bar.style.width = bar.style.width;
+      });
+    }, 300);
+  });
+</script>
+
+</body>
+</html>
